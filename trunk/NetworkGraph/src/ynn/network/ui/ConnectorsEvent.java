@@ -5,6 +5,7 @@ public class ConnectorsEvent
 {
 	public static final int ADDED = 0;
 	public static final int REMOVED = 1;
+	public static final int DIRECTION_CHANGED = 2;
 	
 	private int _type;
 	private ConnectorShape[] _connectors;

@@ -1,5 +1,6 @@
 package ynn.network.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,13 +9,13 @@ import java.util.Set;
 
 public class Node
 {
-	private List<Node> _neighbors;
+	private List<DirectedNeighbor> _neighbors;
 	private Map<String,Object> _attributes;
 	private List<INodeListener> _listeners;
 	
 	public Node()
 	{
-		_neighbors = new LinkedList<Node>();
+		_neighbors = new LinkedList<DirectedNeighbor>();
 		_attributes = new HashMap<String, Object>();
 		_listeners = new LinkedList<INodeListener>();
 	}
@@ -23,7 +24,8 @@ public class Node
 	{
 		if (!_neighbors.contains(node))
 		{
-			_neighbors.add(node);
+			DirectedNeighbor neighbor = new DirectedNeighbor(node, false);
+			_neighbors.add(neighbor);
 			node.addNeighbor(this);
 			fireNeighborAdded(node);
 		}
@@ -41,7 +43,94 @@ public class Node
 	
 	public List<Node> getNeighbors()
 	{
+		List<Node> neighbors = new ArrayList<Node>(_neighbors.size());
+		for (DirectedNeighbor neighbor : _neighbors) neighbors.add(neighbor.getNeighbor());
+		return neighbors;
+	}
+	
+	public List<DirectedNeighbor> getDirectedNeighbors()
+	{
 		return _neighbors;
+	}
+	
+	public void setNeighborDirection(Node node, Direction direction)
+	{
+		Direction currDirection = getNeighborDirection(node);
+		if (currDirection != null && !currDirection.equals(direction))
+		{
+			int index = _neighbors.indexOf(node);
+			if (index >= 0)
+			{
+				DirectedNeighbor neighbor = _neighbors.get(index);
+				switch (direction)
+				{
+				case Both:
+					neighbor.setDirected(true);
+					node.setNeighborDirected(this, true);
+					break;
+				case Default:
+					neighbor.setDirected(true);
+					node.setNeighborDirected(this, false);
+					break;
+				case Other:
+					neighbor.setDirected(false);
+					node.setNeighborDirected(this, true);
+					break;
+				case None:
+					neighbor.setDirected(false);
+					node.setNeighborDirected(this, false);
+					break;
+				}
+			}
+			fireNeighborDirectionChanged(node);
+		}
+	}
+	
+	protected void setNeighborDirected(Node node, boolean directed)
+	{
+		int index = _neighbors.indexOf(node);
+		if (index >= 0)
+		{
+			DirectedNeighbor neighbor = _neighbors.get(index);
+			neighbor.setDirected(directed);
+		}
+	}
+	
+	public Direction getNeighborDirection(Node node)
+	{
+		Direction direction = null;
+		int index = _neighbors.indexOf(node);
+		if (index >= 0)
+		{
+			DirectedNeighbor neighbor = _neighbors.get(index);
+			boolean directedTo = neighbor.isDirected();
+			boolean directedFrom = node.isNeighborDirected(this);
+			if (directedTo && directedFrom)
+			{
+				direction = Direction.Both;
+			}
+			else if (directedTo)
+			{
+				direction = Direction.Default;
+			}
+			else if (directedFrom)
+			{
+				direction = Direction.Other;
+			}
+			else direction = Direction.None;
+		}
+		return direction;
+	}
+	
+	public boolean isNeighborDirected(Node node)
+	{
+		int index = _neighbors.indexOf(node);
+		if (index >= 0)
+		{
+			DirectedNeighbor neighbor = _neighbors.get(index);
+			return neighbor.isDirected();
+		}
+		return false;
 	}
 	
 	public boolean isNeighborOf(Node node)
@@ -122,5 +211,26 @@ public class Node
 	{
 		NodeNeighborEvent e = new NodeNeighborEvent(NodeNeighborEvent.REMOVED, this, neighbor);
 		for (INodeListener l : _listeners) l.nodeNeighborsChanged(e);
+	}
+	
+	private void fireNeighborDirectionChanged(Node neighbor)
+	{
+		NodeNeighborEvent e = new NodeNeighborEvent(NodeNeighborEvent.DIRECTION_CHANGED, this, neighbor);
+		for (INodeListener l : _listeners) l.nodeNeighborsChanged(e);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == null) return false;
+		else if (obj instanceof DirectedNeighbor)
+		{
+			return super.equals(((DirectedNeighbor)obj).getNeighbor());
+		}
+		else if (obj instanceof Node)
+		{
+			return super.equals((Node)obj);	
+		} 
+		else return false;
 	}
 }

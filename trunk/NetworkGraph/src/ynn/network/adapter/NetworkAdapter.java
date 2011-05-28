@@ -1,5 +1,6 @@
 package ynn.network.adapter;
 
+import ynn.network.model.Direction;
 import ynn.network.model.INetworkModelListener;
 import ynn.network.model.NetworkEvent;
 import ynn.network.model.NetworkModel;
@@ -103,6 +104,20 @@ public class NetworkAdapter
 					}
 				}
 				break;
+			case ConnectorsEvent.DIRECTION_CHANGED:
+				for (ConnectorShape connector : e.getConnectors())
+				{
+					if (connector.getVertex1().getData() instanceof Node &&
+						connector.getVertex2().getData() instanceof Node)
+					{
+						Node node1 = (Node)connector.getVertex1().getData();
+						Node node2 = (Node)connector.getVertex2().getData();
+						ConnectorShape.Direction csDirection = connector.getDirection();
+						Direction direction = connectorShapeDirectionToDirection(csDirection);
+						_model.setNeighborsDirection(node1, node2, direction);
+					}
+				}
+				break;
 		}
 	}
 
@@ -153,7 +168,39 @@ public class NetworkAdapter
 			connector = findConnectorShapeOf(e.getNodes().get(0), e.getNodes().get(1));
 			_view.removeShape(connector);
 			break;
+		case NetworkEvent.NODES_CONNECTION_DIRECTION_CHANGED:
+			Node node = e.getNodes().get(0);
+			Node neighbor = e.getNodes().get(1);
+			connector = findConnectorShapeOf(node, neighbor);
+			connector.setDirection(directionToConnectorShapeDirection(node.getNeighborDirection(neighbor)));
+			break;
 		}
+	}
+
+	private ConnectorShape.Direction directionToConnectorShapeDirection(Direction direction)
+	{
+		if (direction == null) return null;
+		switch (direction)
+		{
+			case Both: return ConnectorShape.Direction.Both;
+			case Default: return ConnectorShape.Direction.Default;
+			case Other: return ConnectorShape.Direction.Other;
+			case None: return ConnectorShape.Direction.None;
+		}
+		return null;
+	}
+
+	private Direction connectorShapeDirectionToDirection(ConnectorShape.Direction direction)
+	{
+		if (direction == null) return null;
+		switch (direction)
+		{
+			case Both: return Direction.Both;
+			case Default: return Direction.Default;
+			case Other: return Direction.Other;
+			case None: return Direction.None;
+		}
+		return null;
 	}
 
 	private void handleModelNodeAttributeChanged(NodeAttributeEvent e)

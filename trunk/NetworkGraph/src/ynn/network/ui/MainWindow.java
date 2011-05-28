@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 
 import ynn.network.adapter.NetworkAdapter;
 import ynn.network.model.NetworkModel;
+import ynn.network.ui.ConnectorShape.Direction;
 import ynn.network.ui.NetworkView.Mode;
 import ynn.network.util.NetworkSerializer;
 
@@ -85,6 +86,20 @@ public class MainWindow extends JFrame
 					{
 						ex.printStackTrace();
 					}
+					break;
+				case KeyEvent.VK_D:
+					AbstractShape[] selectedShapes = _networkView.getSelectedShapes();
+					for (AbstractShape selShape : selectedShapes)
+					{
+						if (selShape instanceof ConnectorShape)
+						{
+							ConnectorShape conn = (ConnectorShape)selShape;
+							Direction direction = conn.getDirection();
+							direction = Direction.values()[(direction.ordinal() + 1) % Direction.values().length];
+							_networkView.setConnectorsDirection(new ConnectorShape[] { conn }, direction);
+						}
+					}
+					_networkView.repaint();
 					break;
 				}
 			}

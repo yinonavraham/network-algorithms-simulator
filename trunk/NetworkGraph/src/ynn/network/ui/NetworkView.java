@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import ynn.network.ui.ConnectorShape.Direction;
+
 public class NetworkView extends JPanel
 {
 	private static final long serialVersionUID = 7327880761001439913L;
@@ -164,6 +166,12 @@ public class NetworkView extends JPanel
 		repaint();
 	}
 	
+	public AbstractShape[] getSelectedShapes()
+	{
+		if (_selectedShape != null) return new AbstractShape[] { _selectedShape };
+		else return new AbstractShape[0];
+	}
+	
 	public void addShape(AbstractShape shape)
 	{
 		if (_mode != Mode.View)
@@ -178,6 +186,7 @@ public class NetworkView extends JPanel
 				_shapes.add(shape);
 				fireConnectorsAdded(new ConnectorShape[] { ( ConnectorShape)shape });
 			}
+			repaint();
 		}
 	}
 	
@@ -215,6 +224,19 @@ public class NetworkView extends JPanel
 	public void setMode(Mode mode)
 	{
 		_mode = mode;
+	}
+	
+	public void setConnectorsDirection(ConnectorShape[] connectors, Direction direction)
+	{
+		if (connectors != null)
+		{
+			direction = direction == null ? Direction.None : direction;
+			for (ConnectorShape connector : connectors)
+			{
+				connector.setDirection(direction);
+			}
+			fireConnectorsDirectionChanged(connectors);
+		}
 	}
 
 	@Override
@@ -272,6 +294,12 @@ public class NetworkView extends JPanel
 	private void fireConnectorsRemoved(ConnectorShape[] connectors)
 	{
 		ConnectorsEvent e = new ConnectorsEvent(ConnectorsEvent.REMOVED, connectors);
+		for (INetworkViewListener l : _listeners) l.connectorsChanged(e);
+	}
+
+	private void fireConnectorsDirectionChanged(ConnectorShape[] connectors)
+	{
+		ConnectorsEvent e = new ConnectorsEvent(ConnectorsEvent.DIRECTION_CHANGED, connectors);
 		for (INetworkViewListener l : _listeners) l.connectorsChanged(e);
 	}
 	

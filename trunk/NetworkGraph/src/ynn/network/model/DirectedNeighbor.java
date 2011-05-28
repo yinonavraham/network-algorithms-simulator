@@ -30,4 +30,19 @@ public class DirectedNeighbor
 	{
 		return _neighbor;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == null) return false;
+		else if (obj instanceof DirectedNeighbor)
+		{
+			return _neighbor.equals(((DirectedNeighbor)obj).getNeighbor());
+		}
+		else if (obj instanceof Node)
+		{
+			return _neighbor.equals((Node)obj);	
+		} 
+		else return false;
+	}
 }

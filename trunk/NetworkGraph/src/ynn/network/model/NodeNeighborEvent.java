@@ -4,6 +4,7 @@ public class NodeNeighborEvent
 {
 	public static final int ADDED = 0;
 	public static final int REMOVED = 1;
+	public static final int DIRECTION_CHANGED = 2;
 	
 	private Node _node;
 	private Node _neighbor;

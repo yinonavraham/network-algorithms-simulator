@@ -137,6 +137,22 @@ public class NetworkModel implements INodeListener
 			case NodeNeighborEvent.REMOVED:
 				fireNetworkChanged(NetworkEvent.NODES_DISCONNECTED, new Node[] {e.getNode(), e.getNeighbor()});
 				break;
+			case NodeNeighborEvent.DIRECTION_CHANGED:
+				fireNetworkChanged(NetworkEvent.NODES_CONNECTION_DIRECTION_CHANGED, new Node[] {e.getNode(), e.getNeighbor()});
+				break;
+		}
+	}
+
+	public void setNeighborsDirection(Node node1, Node node2, Direction direction)
+	{
+		if (node1 != null && node2 != null && node1.isNeighborOf(node2))
+		{
+			direction = direction == null ? Direction.None : direction;
+			if (!direction.equals(node1.getNeighborDirection(node2)))
+			{
+				node1.setNeighborDirection(node2, direction);
+				// The DIRECTION_CHANGED event will be fired by node1 and propagated as a network event. 
+			}
 		}
 	}
 }
