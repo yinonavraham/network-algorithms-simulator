@@ -9,6 +9,8 @@ import java.util.Set;
 
 public class Node
 {
+	public static final String ATTRIBUTE_NAME = "Name";
+	
 	private List<DirectedNeighbor> _neighbors;
 	private Map<String,Object> _attributes;
 	private List<INodeListener> _listeners;
@@ -25,6 +27,7 @@ public class Node
 	public void setName(String name)
 	{
 		_name = name;
+		putAttribute(ATTRIBUTE_NAME, name);
 	}
 	
 	public String getName()
