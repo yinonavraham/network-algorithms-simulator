@@ -130,9 +130,15 @@ public class NetworkAdapter
 		case NodesEvent.ADDED:
 			for (NodeShape nodeShape : e.getNodes())
 			{
-				Node node = new Node();
-				nodeShape.setData(node);
-				node.setName(nodeShape.getText());
+				Object nodeObj = nodeShape.getData();
+				Node node;
+				if (nodeObj == null)
+				{
+					node = new Node();
+					nodeShape.setData(node);
+					node.setName(nodeShape.getText());
+				}
+				else node = (Node)nodeObj;
 				_model.addNode(node);
 			}
 			break;

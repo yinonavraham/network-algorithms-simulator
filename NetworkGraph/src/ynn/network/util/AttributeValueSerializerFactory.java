@@ -9,7 +9,12 @@ public final class AttributeValueSerializerFactory
 	static {
 		_types = new HashMap<Class<?>, Class<? extends AttributeValueSerializer>>();
 		// Map types to specific attribute value serializers
-		//_types.put(String.class,DefaultValueSerializer.class);
+//		_types.put(String.class,DefaultValueSerializer.class);
+//		_types.put(Boolean.class,DefaultValueSerializer.class);
+//		_types.put(Integer.class,DefaultValueSerializer.class);
+//		_types.put(Float.class,DefaultValueSerializer.class);
+//		_types.put(Double.class,DefaultValueSerializer.class);
+//		_types.put(Long.class,DefaultValueSerializer.class);
 	}
 	
 	public static AttributeValueSerializer getSerializer(Class<?> cls)

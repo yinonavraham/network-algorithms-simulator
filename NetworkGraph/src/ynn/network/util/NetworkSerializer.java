@@ -186,9 +186,50 @@ public class NetworkSerializer
 		org.w3c.dom.Node attrText = eNode.getAttributes().getNamedItem("text");
 		String text = attrText.getNodeValue();
 		shape.setText(text);
+		for (int i = 0; i < eNode.getChildNodes().getLength(); i++)
+		{
+			if ("Data".equals(eNode.getChildNodes().item(i).getNodeName()))
+			{
+				deserializeNodeData(eNode.getChildNodes().item(i), shape);
+				break;
+			}
+		}
 		
 		_shapesToDeserialize.put(id, shape);
 		_view.addShape(shape);
+	}
+
+	private void deserializeNodeData(org.w3c.dom.Node eNode, NodeShape shape)
+	{
+		Node node = new Node();
+		for (int i = 0; i < eNode.getChildNodes().getLength(); i++)
+		{
+			org.w3c.dom.Node item = eNode.getChildNodes().item(i);
+			if ("Attribute".equals(item.getNodeName()))
+			{
+				org.w3c.dom.Node attrName = item.getAttributes().getNamedItem("name");
+				org.w3c.dom.Node attrType = item.getAttributes().getNamedItem("type");
+				try
+				{
+					Class<?> type = Class.forName(attrType.getNodeValue());
+					String name = attrName.getNodeValue();
+					AttributeValueSerializer serializer = 
+						AttributeValueSerializerFactory.getSerializer(type);
+					Object value = serializer.deserialize(item, type);
+					node.putAttribute(name, value);
+					if (Node.ATTRIBUTE_NAME.equals(name))
+					{
+						String sValue = value == null ? null : "" + value;
+						node.setName(sValue);
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		shape.setData(node);
 	}
 
 	private void deserializeConnectorShape(org.w3c.dom.Node eConnector)
