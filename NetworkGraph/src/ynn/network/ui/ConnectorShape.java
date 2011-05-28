@@ -202,5 +202,32 @@ public class ConnectorShape extends AbstractShape implements IShapeListener
 	{
 		return new Point2D.Double((_line.x1 + _line.x2)/2, (_line.y1 + _line.y2)/2);
 	}
+	
+	@Override
+	public String toString()
+	{
+		String txt1 = _vertex1 != null ? _vertex1.getText() : "";
+		String txt2 = _vertex2 != null ? _vertex2.getText() : "";
+		String op = "---";
+		if (_direction != null)
+		{
+			switch (_direction)
+			{
+			case Both:
+				op = "<->"; 
+				break;
+			case Default:
+				op = "-->"; 
+				break;
+			case None:
+				op = "---"; 
+				break;
+			case Other:
+				op = "<--"; 
+				break;
+			}
+		}
+		return String.format("%s %s %s", txt1, op, txt2);
+	}
 
 }

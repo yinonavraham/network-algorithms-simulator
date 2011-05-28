@@ -79,5 +79,11 @@ public class NodeShape extends AbstractShape
 	{
 		return new Point2D.Double(_ellipse.x,_ellipse.y);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return String.format("(%s)", getText());
+	}
 
 }

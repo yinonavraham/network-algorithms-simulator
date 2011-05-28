@@ -12,12 +12,24 @@ public class Node
 	private List<DirectedNeighbor> _neighbors;
 	private Map<String,Object> _attributes;
 	private List<INodeListener> _listeners;
+	private String _name;
 	
 	public Node()
 	{
 		_neighbors = new LinkedList<DirectedNeighbor>();
 		_attributes = new HashMap<String, Object>();
 		_listeners = new LinkedList<INodeListener>();
+		_name = null;
+	}
+	
+	public void setName(String name)
+	{
+		_name = name;
+	}
+	
+	public String getName()
+	{
+		return _name;
 	}
 	
 	public void addNeighbor(Node node)
@@ -232,5 +244,11 @@ public class Node
 			return super.equals((Node)obj);	
 		} 
 		else return false;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return String.format("Node: %s", _name);
 	}
 }

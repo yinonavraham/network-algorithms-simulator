@@ -127,22 +127,34 @@ public class NetworkSerializer
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(file);
 			org.w3c.dom.Node eNetwork = doc.getElementsByTagName("Network").item(0);
-			for (int i = 0 ; i < eNetwork.getChildNodes().getLength(); i++)
+			String[] networkParts = { "Nodes", "Connectors" };
+			for (String part : networkParts)
 			{
-				org.w3c.dom.Node node = eNetwork.getChildNodes().item(i);
-				if (node.getNodeName().equals("Nodes"))
+				for (int i = 0 ; i < eNetwork.getChildNodes().getLength(); i++)
 				{
-					deserializeNodeShapes(node);
-				}
-				else if (node.getNodeName().equals("Connectors"))
-				{
-					deserializeConnectorShapes(node);
+					org.w3c.dom.Node node = eNetwork.getChildNodes().item(i);
+					if (part.equals(node.getNodeName()))
+					{
+						deserializeNetworkPart(node);
+					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
 			throw new IOException(e);
+		}
+	}
+	
+	private void deserializeNetworkPart(org.w3c.dom.Node eNetworkPart)
+	{
+		if (eNetworkPart.getNodeName().equals("Nodes"))
+		{
+			deserializeNodeShapes(eNetworkPart);
+		}
+		else if (eNetworkPart.getNodeName().equals("Connectors"))
+		{
+			deserializeConnectorShapes(eNetworkPart);
 		}
 	}
 	
