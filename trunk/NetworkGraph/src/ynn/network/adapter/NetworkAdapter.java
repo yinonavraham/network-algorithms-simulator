@@ -88,7 +88,9 @@ public class NetworkAdapter
 					{
 						Node node1 = (Node)connector.getVertex1().getData();
 						Node node2 = (Node)connector.getVertex2().getData();
+						Direction direction = connectorShapeDirectionToDirection(connector.getDirection());
 						_model.connectNodes(node1, node2);
+						_model.setNeighborsDirection(node1, node2, direction);
 					}
 				}
 				break;
@@ -130,6 +132,7 @@ public class NetworkAdapter
 			{
 				Node node = new Node();
 				nodeShape.setData(node);
+				node.setName(nodeShape.getText());
 				_model.addNode(node);
 			}
 			break;
