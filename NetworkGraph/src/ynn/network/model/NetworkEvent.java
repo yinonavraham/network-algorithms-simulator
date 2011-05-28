@@ -9,6 +9,7 @@ public class NetworkEvent
 	public static final int NODES_REMOVED = 1;
 	public static final int NODES_CONNECTED = 2;
 	public static final int NODES_DISCONNECTED = 3;
+	public static final int NODES_CONNECTION_DIRECTION_CHANGED = 4;
 	
 	private int _type;
 	private List<Node> _nodes;
