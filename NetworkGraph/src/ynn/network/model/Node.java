@@ -12,14 +12,14 @@ public class Node
 	public static final String ATTRIBUTE_NAME = "Name";
 	
 	private List<DirectedNeighbor> _neighbors;
-	private Map<String,Object> _attributes;
+	private Map<Attribute,Object> _attributes;
 	private List<INodeListener> _listeners;
 	private String _name;
 	
 	public Node()
 	{
 		_neighbors = new LinkedList<DirectedNeighbor>();
-		_attributes = new HashMap<String, Object>();
+		_attributes = new HashMap<Attribute, Object>();
 		_listeners = new LinkedList<INodeListener>();
 		_name = null;
 	}
@@ -27,7 +27,7 @@ public class Node
 	public void setName(String name)
 	{
 		_name = name;
-		putAttribute(ATTRIBUTE_NAME, name);
+		putAttribute(new Attribute(ATTRIBUTE_NAME, String.class), name);
 	}
 	
 	public String getName()
@@ -153,7 +153,21 @@ public class Node
 		return _neighbors.contains(node);
 	}
 	
-	public void putAttribute(String attribute, Object value)
+	public void putAttribute(String attributeName, Object value)
+	{
+		Attribute attribute = null;
+		if (_attributes.containsKey(attributeName))
+		{
+			attribute = getAttributeByName(attributeName);
+		}
+		else if (value != null)
+		{
+			attribute = new Attribute(attributeName, value.getClass());
+		}
+		if (attribute != null) putAttribute(attribute, value);
+	}
+	
+	public void putAttribute(Attribute attribute, Object value)
 	{
 		if (_attributes.containsKey(attribute))
 		{
@@ -168,24 +182,50 @@ public class Node
 		}
 	}
 	
-	public Object getAttributeValue(String attribute)
+	public Object getAttributeValue(String attributeName)
+	{
+		return _attributes.get(attributeName);
+	}
+	
+	public Object getAttributeValue(Attribute attribute)
 	{
 		return _attributes.get(attribute);
 	}
 	
-	public void removeAttribute(String attribute)
+	public void removeAttribute(String attributeName)
 	{
-		if (_attributes.containsKey(attribute))
+		if (_attributes.containsKey(attributeName))
 		{
-			Object value = _attributes.get(attribute);
-			_attributes.remove(attribute);
-			fireAttributeRemoved(attribute, value);
+			Object value = _attributes.get(attributeName);
+			_attributes.remove(attributeName);
+			fireAttributeRemoved(getAttributeByName(attributeName), value);
 		}
 	}
 	
-	public Set<String> getAttributes()
+	public Attribute getAttributeByName(String name)
+	{
+		for (Attribute attr : _attributes.keySet())
+		{
+			if (attr.getName().equals(name)) return attr;
+		}
+		return null;
+	}
+	
+	public Set<Attribute> getAttributes()
 	{
 		return _attributes.keySet();
+	}
+	
+	public String[] getAttributesNames()
+	{
+		String[] names = new String[_attributes.size()];
+		int i = 0;
+		for (Attribute attr : _attributes.keySet())
+		{
+			names[i] = attr.getName();
+			i++;
+		}
+		return names;
 	}
 	
 	public void addListener(INodeListener l)
@@ -198,19 +238,19 @@ public class Node
 		if (_listeners.contains(l)) _listeners.remove(l);
 	}
 	
-	private void fireAttributeChanged(String attr, Object oldValue, Object newValue)
+	private void fireAttributeChanged(Attribute attr, Object oldValue, Object newValue)
 	{
 		NodeAttributeEvent e = new NodeAttributeEvent(this, AttributeEvent.CHANGED, attr, oldValue, newValue);
 		for (INodeListener l : _listeners) l.nodeAttributeChanged(e);
 	}
 	
-	private void fireAttributeAdded(String attr, Object value)
+	private void fireAttributeAdded(Attribute attr, Object value)
 	{
 		NodeAttributeEvent e = new NodeAttributeEvent(this, AttributeEvent.ADDED, attr, value, value);
 		for (INodeListener l : _listeners) l.nodeAttributeChanged(e);
 	}
 	
-	private void fireAttributeRemoved(String attr, Object value)
+	private void fireAttributeRemoved(Attribute attr, Object value)
 	{
 		NodeAttributeEvent e = new NodeAttributeEvent(this, AttributeEvent.REMOVED, attr, value, value);
 		for (INodeListener l : _listeners) l.nodeAttributeChanged(e);
