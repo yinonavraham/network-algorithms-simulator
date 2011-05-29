@@ -4,7 +4,7 @@ public class NodeAttributeEvent extends AttributeEvent
 {
 	private Node _node;
 	
-	public NodeAttributeEvent(Node node, int type, String attribute, Object oldValue, Object newValue)
+	public NodeAttributeEvent(Node node, int type, Attribute attribute, Object oldValue, Object newValue)
 	{
 		super(type, attribute, oldValue, newValue);
 		_node = node;

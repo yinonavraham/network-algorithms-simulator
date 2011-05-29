@@ -22,6 +22,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ynn.network.model.Attribute;
 import ynn.network.model.Node;
 import ynn.network.ui.AbstractShape;
 import ynn.network.ui.ConnectorShape;
@@ -216,7 +217,8 @@ public class NetworkSerializer
 					AttributeValueSerializer serializer = 
 						AttributeValueSerializerFactory.getSerializer(type);
 					Object value = serializer.deserialize(item, type);
-					node.putAttribute(name, value);
+					Attribute attribute = new Attribute(name, type);
+					node.putAttribute(attribute, value);
 					if (Node.ATTRIBUTE_NAME.equals(name))
 					{
 						String sValue = value == null ? null : "" + value;
@@ -273,11 +275,11 @@ public class NetworkSerializer
 	{
 		Element eData = doc.createElement("Data");
 		 
-		for (String attr : data.getAttributes())
+		for (Attribute attr : data.getAttributes())
 		{
 			Element eAttr = doc.createElement("Attribute");
 			Attr attrName = doc.createAttribute("name");
-			attrName.setNodeValue(attr);
+			attrName.setNodeValue(attr.getName());
 			eAttr.setAttributeNode(attrName);
 			Object value = data.getAttributeValue(attr);
 			if (value != null)

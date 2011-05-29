@@ -7,11 +7,11 @@ public class AttributeEvent
 	public static final int CHANGED = 2;
 	
 	private int _type;
-	private String _attribute;
+	private Attribute _attribute;
 	private Object _oldValue;
 	private Object _newValue;
 	
-	public AttributeEvent(int type, String attribute, Object oldValue, Object newValue)
+	public AttributeEvent(int type, Attribute attribute, Object oldValue, Object newValue)
 	{
 		_type = type;
 		_attribute = attribute;
@@ -24,7 +24,7 @@ public class AttributeEvent
 		return _type;
 	}
 	
-	public String getAttribute()
+	public Attribute getAttribute()
 	{
 		return _attribute;
 	}
