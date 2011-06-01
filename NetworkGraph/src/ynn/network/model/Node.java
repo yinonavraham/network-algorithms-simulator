@@ -137,6 +137,15 @@ public class Node
 		return direction;
 	}
 	
+	public Node getFirstNeighborByName(String name)
+	{
+		for (Node neighbor : getNeighbors())
+		{
+			if (neighbor.getName().equals(name)) return neighbor;
+		}
+		return null;
+	}
+	
 	public boolean isNeighborDirected(Node node)
 	{
 		int index = _neighbors.indexOf(node);
