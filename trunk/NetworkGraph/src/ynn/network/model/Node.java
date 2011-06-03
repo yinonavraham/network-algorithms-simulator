@@ -193,7 +193,7 @@ public class Node
 	
 	public Object getAttributeValue(String attributeName)
 	{
-		return _attributes.get(attributeName);
+		return _attributes.get(new Attribute(attributeName, null));
 	}
 	
 	public Object getAttributeValue(Attribute attribute)

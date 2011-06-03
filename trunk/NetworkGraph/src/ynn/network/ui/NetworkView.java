@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import ynn.network.model.Node;
 import ynn.network.ui.ConnectorShape.Direction;
 
 public class NetworkView extends JPanel
@@ -29,6 +30,7 @@ public class NetworkView extends JPanel
 	public NetworkView()
 	{
 		super();
+		setToolTipText("");
 		_listeners = new LinkedList<INetworkViewListener>();
 		_shapes = new LinkedList<AbstractShape>();
 		addMouseListener(new MouseAdapter()
@@ -150,6 +152,43 @@ public class NetworkView extends JPanel
 				}
 			}
 		});
+	}
+	
+	@Override
+	public String getToolTipText(MouseEvent e)
+	{
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < _shapes.size(); i++)
+		{
+			AbstractShape shape = _shapes.get(i);
+			if (shape.contains(e.getPoint()))
+			{
+				if (shape instanceof ConnectorShape)
+				{
+					ConnectorShape connector = (ConnectorShape)shape;
+					sb.append(connector.toString());
+				}
+				else if (shape instanceof NodeShape)
+				{
+					NodeShape node = (NodeShape)shape;
+					sb.append("<html>");
+					sb.append("<b><u>" + node.getText() + "</u></b>");
+					if (node.getData() != null && node.getData() instanceof Node)
+					{
+						Node dataNode = (Node)node.getData();
+						for (String attr : dataNode.getAttributesNames())
+						{
+							Object value = dataNode.getAttributeValue(attr);
+							String sValue = value != null ? value.toString() : "";
+							sb.append(String.format("<br>%s: %s", attr, sValue));
+						}
+					}
+					sb.append("</html>");
+				}
+				break;
+			}
+		}
+		return sb.toString();
 	}
 
 	private void setSelectedShape(AbstractShape shape)

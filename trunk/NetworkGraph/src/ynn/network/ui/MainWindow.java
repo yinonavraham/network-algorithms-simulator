@@ -11,9 +11,12 @@ import javax.swing.SwingUtilities;
 
 import ynn.network.adapter.NetworkAdapter;
 import ynn.network.model.NetworkModel;
+import ynn.network.model.Node;
 import ynn.network.ui.ConnectorShape.Direction;
 import ynn.network.ui.NetworkView.Mode;
 import ynn.network.util.NetworkSerializer;
+import ynn.tech.algorithms.network.AlgorithmDescriptor;
+import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 
 public class MainWindow extends JFrame
 {
@@ -35,6 +38,7 @@ public class MainWindow extends JFrame
         _networkAdapter.attach(_networkModel);
         _networkAdapter.attach(_networkView);
         setContentPane(_networkView);
+        final AlgorithmDescriptor algDescriptor = new Aky90Descriptor();
         addKeyListener(new KeyAdapter()
 		{	
 			@Override
@@ -54,6 +58,10 @@ public class MainWindow extends JFrame
 				case KeyEvent.VK_INSERT:
 					NodeShape shape = new NodeShape();
 					shape.setText(String.valueOf(_nodeId++));
+					Node node = new Node();
+					node.setName(shape.getText());
+					algDescriptor.getUtilities().initNodeAttributes(node);
+					shape.setData(node);
 					_networkView.addShape(shape);
 					break;
 				case KeyEvent.VK_DELETE:

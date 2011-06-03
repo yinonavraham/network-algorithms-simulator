@@ -6,4 +6,5 @@ public interface AlgorithmDescriptor
 	String getName();
 	String getDescription();
 	NodeAttributes getNodeAttributes();
+	AlgorithmUtils getUtilities();
 }

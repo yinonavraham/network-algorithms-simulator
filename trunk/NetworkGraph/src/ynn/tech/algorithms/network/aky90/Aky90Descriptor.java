@@ -1,10 +1,12 @@
 package ynn.tech.algorithms.network.aky90;
 
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
+import ynn.tech.algorithms.network.AlgorithmUtils;
 import ynn.tech.algorithms.network.NodeAttributes;
 
 public class Aky90Descriptor implements AlgorithmDescriptor
 {
+	private static Aky90Utils __utils = null;
 
 	@Override
 	public NodeAttributes getNodeAttributes()
@@ -32,6 +34,13 @@ public class Aky90Descriptor implements AlgorithmDescriptor
 			"network of processors that communicate through sha~ed memory is presented. The " +
 			"processors have unique identifiers but are otherwise identical. The network topology is assumed " +
 			"to be dynamic, that is, edges can join or leave the computation before it eventually stabilizes.";
+	}
+
+	@Override
+	public AlgorithmUtils getUtilities()
+	{
+		if (__utils == null) __utils = new Aky90Utils(); 
+		return __utils;
 	}
 
 }
