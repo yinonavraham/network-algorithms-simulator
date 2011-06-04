@@ -62,22 +62,22 @@ public class Icons
 	
 	public static Icon getEditModeConnect()
 	{
-		return getIcon("Branch.png");
+		return getIcon("Branch16.png");
 	}
 	
 	public static Icon getEditModeMove()
 	{
-		return getIcon("element.png");
+		return getIcon("Element_Copy16.png");
 	}
 	
 	public static Icon getInsert()
 	{
-		return getIcon("element_add.png");
+		return getIcon("Element_Add16.png");
 	}
 	
 	public static Icon getDelete()
 	{
-		return getIcon("element_delete.png");
+		return getIcon("Element_Delete16.png");
 	}
 	
 	public static Image getNetwork()
