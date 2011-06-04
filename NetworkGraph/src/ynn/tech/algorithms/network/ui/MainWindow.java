@@ -59,6 +59,13 @@ class MainWindow extends JFrame
 	private JRadioButtonMenuItem _editMenuConnect;
 	private JMenuItem _editMenuInsertNode;
 	private JMenuItem _editMenuDelete;
+	private JMenu _playMenu;
+	private JMenuItem _playMenuStart;
+	private JMenuItem _playMenuStop;
+	private JMenuItem _playMenuNext;
+	private JMenuItem _playMenuPrev;
+	private JMenu _helpMenu;
+	private JMenuItem _helpMenuAbout;
 	
 	private JPanel _toolBarsPanel;
 	private JToolBar _toolBarFile;
@@ -72,6 +79,11 @@ class MainWindow extends JFrame
 	private JComboBox _toolBarEditModeType;
 	private ComboBoxLabelItemModel _toolBarEditModeTypeMove;
 	private ComboBoxLabelItemModel _toolBarEditModeTypeConnect;
+	private JToolBar _toolBarPlay;
+	private JButton _toolBarPlayStart;
+	private JButton _toolBarPlayStop;
+	private JButton _toolBarPlayNext;
+	private JButton _toolBarPlayPrev;
 
 	private JPanel _contentPanel;
 	
@@ -91,7 +103,7 @@ class MainWindow extends JFrame
 	{
 		super("Network Algorithms Simulator");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(500, 300);
+		setSize(600, 450);
         setLocationRelativeTo(null);
         setIconImage(Icons.getNetwork());
 		initializeControls();
@@ -111,6 +123,8 @@ class MainWindow extends JFrame
 		initializeToolBar();
 		//initializeNetworkView();
 		enableEdit(false);
+		enablePlay(false);
+		enableSave(false);
 	}
 
 	private void initializeNetworkView()
@@ -133,8 +147,7 @@ class MainWindow extends JFrame
 		_toolBarsPanel.setBorder(BorderFactory.createEtchedBorder());
 		initializeFileToolBar();
 		initializeEditToolBar();
-		_toolBarsPanel.add(_toolBarFile);
-		_toolBarsPanel.add(_toolBarEdit);
+		initializePlayToolBar();
         _contentPanel.add(_toolBarsPanel,BorderLayout.NORTH);
 	}
 	
@@ -177,6 +190,8 @@ class MainWindow extends JFrame
 			}
 		});
 		_toolBarFile.add(_toolBarFileSave);
+		
+		_toolBarsPanel.add(_toolBarFile);
 	}
 	
 	private void initializeEditToolBar()
@@ -267,6 +282,63 @@ class MainWindow extends JFrame
 			}
 		});
 		_toolBarEdit.add(_toolBarEditModeType);
+
+		_toolBarsPanel.add(_toolBarEdit);
+	}
+	
+	private void initializePlayToolBar()
+	{
+		_toolBarPlay = new JToolBar();
+		
+		_toolBarPlayPrev = new JButton(Icons.getRewind());
+		_toolBarPlayPrev.setToolTipText("Step Back");
+		_toolBarPlayPrev.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onSimulationStepBack();
+			}
+		});
+		_toolBarPlay.add(_toolBarPlayPrev);
+		
+		_toolBarPlayStop = new JButton(Icons.getStop());
+		_toolBarPlayStop.setToolTipText("Stop Simulation");
+		_toolBarPlayStop.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onStopSimulation();
+			}
+		});
+		_toolBarPlay.add(_toolBarPlayStop);
+		
+		_toolBarPlayStart = new JButton(Icons.getPlay());
+		_toolBarPlayStart.setToolTipText("Play Simulation");
+		_toolBarPlayStart.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onStartSimulation();
+			}
+		});
+		_toolBarPlay.add(_toolBarPlayStart);
+		
+		_toolBarPlayNext = new JButton(Icons.getForward());
+		_toolBarPlayNext.setToolTipText("Step Forward");
+		_toolBarPlayNext.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onSimulationNextStep();
+			}
+		});
+		_toolBarPlay.add(_toolBarPlayNext);
+		
+		_toolBarsPanel.add(_toolBarPlay);
 	}
 
 	private void initializeMenu()
@@ -274,6 +346,8 @@ class MainWindow extends JFrame
 		_menuBar = new JMenuBar();
 		initializeFileMenu();
 		initializeEditMenu();
+		initializePlayMenu();
+		initializeHelpMenu();
 		setJMenuBar(_menuBar);
 	}
 
@@ -435,6 +509,86 @@ class MainWindow extends JFrame
 		_editMenu.add(_editMenuDelete);
 	}
 
+	private void initializePlayMenu()
+	{
+		// Play
+		_playMenu = new JMenu("Simulation");
+		_playMenu.setMnemonic(KeyEvent.VK_P);
+		_menuBar.add(_playMenu);
+		// Play -> Start
+		_playMenuStart = new JMenuItem("Start", KeyEvent.VK_S);
+		_playMenuStart.setIcon(Icons.getPlay());
+		_playMenuStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+		_playMenuStart.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onStartSimulation();
+			}
+		});
+		_playMenu.add(_playMenuStart);
+		// Play -> Stop
+		_playMenuStop = new JMenuItem("Stop", KeyEvent.VK_T);
+		_playMenuStop.setIcon(Icons.getStop());
+		_playMenuStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, KeyEvent.CTRL_MASK));
+		_playMenuStop.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onStopSimulation();
+			}
+		});
+		_playMenu.add(_playMenuStop);
+		// Play -> Next
+		_playMenuNext = new JMenuItem("Next", KeyEvent.VK_N);
+		_playMenuNext.setIcon(Icons.getForward());
+		_playMenuNext.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
+		_playMenuNext.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onSimulationNextStep();
+			}
+		});
+		_playMenu.add(_playMenuNext);
+		// Play -> Back
+		_playMenuPrev = new JMenuItem("Back", KeyEvent.VK_B);
+		_playMenuPrev.setIcon(Icons.getRewind());
+		_playMenuPrev.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		_playMenuPrev.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onSimulationStepBack();
+			}
+		});
+		_playMenu.add(_playMenuPrev);
+	}
+
+	private void initializeHelpMenu()
+	{
+		// Help
+		_helpMenu = new JMenu("Help");
+		_helpMenu.setMnemonic(KeyEvent.VK_H);
+		_menuBar.add(_helpMenu);
+		// Help -> About
+		_helpMenuAbout = new JMenuItem("About", KeyEvent.VK_A);
+		_helpMenuAbout.setIcon(Icons.getAbout());
+		_helpMenuAbout.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onAbout();
+			}
+		});
+		_helpMenu.add(_helpMenuAbout);
+	}
+
 	private void enableEdit(boolean enabled)
 	{
 		_editMenu.setEnabled(enabled);
@@ -444,13 +598,28 @@ class MainWindow extends JFrame
 		_toolBarEditModeType.setEnabled(enabled);
 	}
 
+	private void enablePlay(boolean enabled)
+	{
+		_playMenu.setEnabled(enabled);
+		_toolBarPlayNext.setEnabled(enabled);
+		_toolBarPlayPrev.setEnabled(enabled);
+		_toolBarPlayStart.setEnabled(enabled);
+		_toolBarPlayStop.setEnabled(enabled);
+	}
+	
+	private void enableSave(boolean enabled)
+	{
+		_fileMenuSave.setEnabled(enabled);
+		_fileMenuSaveAs.setEnabled(enabled);
+		_toolBarFileSave.setEnabled(enabled);
+	}
+
 	// #######################################################################
 	// ##########                 on event methods                  ##########
 	// #######################################################################
 
 	private void onNew()
 	{
-		// TODO
 		NewNetworkDialog dialog = new NewNetworkDialog(this, _algDescriptors);
 		AlgorithmDescriptor descriptor = dialog.showDialog();
 		if (descriptor != null)
@@ -460,6 +629,7 @@ class MainWindow extends JFrame
 			initializeNetworkView();
 			validate();
 			enableEdit(true);
+			enableSave(true);
 		}
 	}
 
@@ -476,10 +646,15 @@ class MainWindow extends JFrame
 			if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
 				file = dialog.getSelectedFile();
+				initializeNetworkView();
+				validate();
 				NetworkSerializer serializer = new NetworkSerializer(_networkView);
 				serializer.deserialize(file);
 				_currentFile = file;
-				_networkView.repaint();
+				enableEdit(true);
+				enablePlay(false);
+				enableSave(true);
+				validate();
 			}
 		}
 		catch (IOException ex)
@@ -490,6 +665,10 @@ class MainWindow extends JFrame
 					"Error occured while trying to load from file \"%s\":\n%s",
 					file, ex.getMessage()), 
 				"Error", JOptionPane.ERROR_MESSAGE);
+			enableEdit(false);
+			enableSave(false);
+			enablePlay(false);
+			_algDescriptor = null;
 		}
 	}
 
@@ -560,6 +739,8 @@ class MainWindow extends JFrame
 		_editMenuDelete.setEnabled(allow);
 		_toolBarEditDelete.setEnabled(allow);
 		_toolBarEditInsert.setEnabled(allow);
+		_toolBarEditModeType.setEnabled(allow);
+		enablePlay(!allow);
 	}
 
 	protected void onEditModeSelected(Mode mode)
@@ -592,6 +773,31 @@ class MainWindow extends JFrame
 	protected void onDeleteSelectedShapes()
 	{
 		_networkView.removeSelectedShape();
+	}
+	
+	private void onStartSimulation()
+	{
+		// TODO
+	}
+	
+	private void onStopSimulation()
+	{
+		// TODO
+	}
+	
+	private void onSimulationNextStep()
+	{
+		// TODO
+	}
+	
+	private void onSimulationStepBack()
+	{
+		// TODO
+	}
+	
+	private void onAbout()
+	{
+		// TODO
 	}
 	
 	// #######################################################################
