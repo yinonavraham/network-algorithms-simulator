@@ -1,21 +1,26 @@
 package ynn.tech.algorithms.network.ui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
@@ -23,6 +28,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 import ynn.network.adapter.NetworkAdapter;
 import ynn.network.model.NetworkModel;
@@ -33,6 +39,7 @@ import ynn.network.ui.NodeShape;
 import ynn.network.util.NetworkSerializer;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
+import ynn.tech.algorithms.network.dtr74.Dtr74Descriptor;
 import ynn.tech.algorithms.network.ui.icons.Icons;
 
 class MainWindow extends JFrame
@@ -44,6 +51,7 @@ class MainWindow extends JFrame
 	private JMenuItem _fileMenuExit;
 	private JMenuItem _fileMenuOpen;
 	private JMenuItem _fileMenuSave;
+	private JMenuItem _fileMenuSaveAs;
 	private JMenuItem _fileMenuNew;
 	private JMenu _editMenu;
 	private JCheckBoxMenuItem _editMenuMode;
@@ -52,13 +60,18 @@ class MainWindow extends JFrame
 	private JMenuItem _editMenuInsertNode;
 	private JMenuItem _editMenuDelete;
 	
-	private JToolBar _toolBar;
+	private JPanel _toolBarsPanel;
+	private JToolBar _toolBarFile;
 	private JButton _toolBarFileNew;
 	private JButton _toolBarFileOpen;
 	private JButton _toolBarFileSave;
+	private JToolBar _toolBarEdit;
 	private JToggleButton _toolBarEditMode;
 	private JButton _toolBarEditInsert;
 	private JButton _toolBarEditDelete;
+	private JComboBox _toolBarEditModeType;
+	private ComboBoxLabelItemModel _toolBarEditModeTypeMove;
+	private ComboBoxLabelItemModel _toolBarEditModeTypeConnect;
 
 	private JPanel _contentPanel;
 	
@@ -66,7 +79,12 @@ class MainWindow extends JFrame
     private NetworkModel _networkModel;
     private NetworkAdapter _networkAdapter;
     
-    private int _nodeId = 0;
+    private int _nodeId = 1;
+	private File _currentFile = null;
+    private AlgorithmDescriptor[] _algDescriptors = new AlgorithmDescriptor[] {
+    	new Aky90Descriptor(),
+    	new Dtr74Descriptor()
+    };
     private AlgorithmDescriptor _algDescriptor = null;
 
 	public MainWindow()
@@ -91,38 +109,41 @@ class MainWindow extends JFrame
 		setContentPane(_contentPanel);
 		initializeMenu();
 		initializeToolBar();
-		initializeNetworkView();
-        _contentPanel.add(_toolBar,BorderLayout.NORTH);
-        _contentPanel.add(_networkView,BorderLayout.CENTER);
-		addKeyListener(new KeyAdapter()
-		{
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				switch (e.getKeyCode())
-				{
-				case KeyEvent.VK_P:
-					_networkAdapter.getClass();
-					break;
-				}
-			}
-		});
+		//initializeNetworkView();
+		enableEdit(false);
 	}
 
 	private void initializeNetworkView()
 	{
+		if (_networkView != null) _contentPanel.remove(_networkView);
+		_networkModel = null;
+        _networkView = null;
+        _networkAdapter = null;
         _networkModel = new NetworkModel();
         _networkView = new NetworkView();
         _networkAdapter = new NetworkAdapter();
         _networkAdapter.attach(_networkModel);
         _networkAdapter.attach(_networkView);
+        _contentPanel.add(_networkView,BorderLayout.CENTER);
 	}
 
 	private void initializeToolBar()
 	{
-		_toolBar = new JToolBar();
+		_toolBarsPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+		_toolBarsPanel.setBorder(BorderFactory.createEtchedBorder());
+		initializeFileToolBar();
+		initializeEditToolBar();
+		_toolBarsPanel.add(_toolBarFile);
+		_toolBarsPanel.add(_toolBarEdit);
+        _contentPanel.add(_toolBarsPanel,BorderLayout.NORTH);
+	}
+	
+	private void initializeFileToolBar()
+	{
+		_toolBarFile = new JToolBar();
 		
 		_toolBarFileNew = new JButton(Icons.getNew());
+		_toolBarFileNew.setToolTipText("New File");
 		_toolBarFileNew.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -131,9 +152,10 @@ class MainWindow extends JFrame
 				onNew();
 			}
 		});
-		_toolBar.add(_toolBarFileNew);
+		_toolBarFile.add(_toolBarFileNew);
 
 		_toolBarFileOpen = new JButton(Icons.getOpen());
+		_toolBarFileOpen.setToolTipText("Open File");
 		_toolBarFileOpen.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -142,9 +164,10 @@ class MainWindow extends JFrame
 				onOpen();
 			}
 		});
-		_toolBar.add(_toolBarFileOpen);
+		_toolBarFile.add(_toolBarFileOpen);
 
 		_toolBarFileSave = new JButton(Icons.getSave());
+		_toolBarFileSave.setToolTipText("Save File");
 		_toolBarFileSave.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -153,34 +176,16 @@ class MainWindow extends JFrame
 				onSave();
 			}
 		});
-		_toolBar.add(_toolBarFileSave);
-		
-		_toolBar.addSeparator();
-
-		_toolBarEditInsert = new JButton(Icons.getInsert());
-		_toolBarEditInsert.addActionListener(new ActionListener()
-		{	
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				onInsertNewNode();
-			}
-		});
-		_toolBar.add(_toolBarEditInsert);
-
-		_toolBarEditDelete = new JButton(Icons.getDelete());
-		_toolBarEditDelete.addActionListener(new ActionListener()
-		{	
-			@Override
-			public void actionPerformed(ActionEvent arg0)
-			{
-				onDeleteSelectedShapes();
-			}
-		});
-		_toolBar.add(_toolBarEditDelete);
+		_toolBarFile.add(_toolBarFileSave);
+	}
+	
+	private void initializeEditToolBar()
+	{
+		_toolBarEdit = new JToolBar();
 		
 		_toolBarEditMode = new JToggleButton(Icons.getEditMode());
 		_toolBarEditMode.setSelected(true);
+		_toolBarEditMode.setToolTipText("Switch To View Mode");
 		_toolBarEditMode.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -189,7 +194,79 @@ class MainWindow extends JFrame
 				onAllowEditChanged(_toolBarEditMode.isSelected());
 			}
 		});
-		_toolBar.add(_toolBarEditMode);
+		_toolBarEdit.add(_toolBarEditMode);
+		
+		_toolBarEdit.addSeparator();
+
+		_toolBarEditInsert = new JButton(Icons.getInsert());
+		_toolBarEditInsert.setToolTipText("Insert New Node");
+		_toolBarEditInsert.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				onInsertNewNode();
+			}
+		});
+		_toolBarEdit.add(_toolBarEditInsert);
+
+		_toolBarEditDelete = new JButton(Icons.getDelete());
+		_toolBarEditDelete.setToolTipText("Delete Selected Shape(s)");
+		_toolBarEditDelete.addActionListener(new ActionListener()
+		{	
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				onDeleteSelectedShapes();
+			}
+		});
+		_toolBarEdit.add(_toolBarEditDelete);
+		
+		_toolBarEditModeType = new JComboBox();
+		_toolBarEditModeType.setRenderer(new ComboBoxLabelRenderer(false));
+		_toolBarEditModeTypeMove = new ComboBoxLabelItemModel()
+		{	
+			@Override
+			public Object getValue() { return Mode.Move; }
+			
+			@Override
+			public String getToolTip() { return "Move Elements"; }
+			
+			@Override
+			public String getText() { return "Move"; }
+			
+			@Override
+			public Icon getIcon() { return Icons.getEditModeMove(); }
+		};
+		_toolBarEditModeType.addItem(_toolBarEditModeTypeMove);
+		_toolBarEditModeTypeConnect = new ComboBoxLabelItemModel()
+		{	
+			@Override
+			public Object getValue() { return Mode.Connect; }
+			
+			@Override
+			public String getToolTip() { return "Connect Elements"; }
+			
+			@Override
+			public String getText() { return "Connect"; }
+			
+			@Override
+			public Icon getIcon() { return Icons.getEditModeConnect(); }
+		};
+		_toolBarEditModeType.addItem(_toolBarEditModeTypeConnect);
+		_toolBarEditModeType.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				Object value = _toolBarEditModeType.getSelectedItem();
+				if (value instanceof ComboBoxLabelItemModel)
+				{
+					onEditModeSelected((Mode)((ComboBoxLabelItemModel)value).getValue());
+				}
+			}
+		});
+		_toolBarEdit.add(_toolBarEditModeType);
 	}
 
 	private void initializeMenu()
@@ -245,6 +322,19 @@ class MainWindow extends JFrame
 			}
 		});
 		_fileMenu.add(_fileMenuSave);
+		// File -> Save As
+		_fileMenuSaveAs = new JMenuItem("Save As", KeyEvent.VK_A);
+		_fileMenuSaveAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+		_fileMenuSaveAs.setIcon(Icons.getSave());
+		_fileMenuSaveAs.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onSaveAs(null);
+			}
+		});
+		_fileMenu.add(_fileMenuSaveAs);
 		// File -> -----
 		_fileMenu.add(new JSeparator());
 		// File -> Exit
@@ -272,14 +362,6 @@ class MainWindow extends JFrame
 		_editMenuMode.setSelected(true);
 		_editMenuMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_MASK));
 		_editMenuMode.setIcon(Icons.getEditMode());
-//		_editMenuMode.addItemListener(new ItemListener()
-//		{
-//			@Override
-//			public void itemStateChanged(ItemEvent e)
-//			{
-//				onAllowEditChanged(e.getStateChange() == ItemEvent.SELECTED);
-//			}
-//		});
 		_editMenuMode.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -303,7 +385,7 @@ class MainWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				onEditModeSelected(_editMenuMove);
+				onEditModeSelected(Mode.Move);
 			}
 		});
 		group.add(_editMenuMove);
@@ -318,7 +400,7 @@ class MainWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				onEditModeSelected(_editMenuConnect);
+				onEditModeSelected(Mode.Connect);
 			}
 		});
 		group.add(_editMenuConnect);
@@ -353,6 +435,15 @@ class MainWindow extends JFrame
 		_editMenu.add(_editMenuDelete);
 	}
 
+	private void enableEdit(boolean enabled)
+	{
+		_editMenu.setEnabled(enabled);
+		_toolBarEditMode.setEnabled(enabled);
+		_toolBarEditInsert.setEnabled(enabled);
+		_toolBarEditDelete.setEnabled(enabled);
+		_toolBarEditModeType.setEnabled(enabled);
+	}
+
 	// #######################################################################
 	// ##########                 on event methods                  ##########
 	// #######################################################################
@@ -360,35 +451,85 @@ class MainWindow extends JFrame
 	private void onNew()
 	{
 		// TODO
-		System.err.println("New");
+		NewNetworkDialog dialog = new NewNetworkDialog(this, _algDescriptors);
+		AlgorithmDescriptor descriptor = dialog.showDialog();
+		if (descriptor != null)
+		{
+			_nodeId = 1;
+			_algDescriptor = descriptor;
+			initializeNetworkView();
+			validate();
+			enableEdit(true);
+		}
 	}
 
 	private void onOpen()
 	{
+		File file = null;
 		try
 		{
-			File file = new File("c:\\Temp\\model.xml");
-			NetworkSerializer serializer = new NetworkSerializer(_networkView);
-			serializer.deserialize(file);
-			_networkView.repaint();
+			JFileChooser dialog = new JFileChooser(_currentFile);
+			dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			dialog.setMultiSelectionEnabled(false);
+			dialog.setAcceptAllFileFilterUsed(false);
+			dialog.setFileFilter(createFileFilter());
+			if (dialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				file = dialog.getSelectedFile();
+				NetworkSerializer serializer = new NetworkSerializer(_networkView);
+				serializer.deserialize(file);
+				_currentFile = file;
+				_networkView.repaint();
+			}
 		}
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, 
+				String.format(
+					"Error occured while trying to load from file \"%s\":\n%s",
+					file, ex.getMessage()), 
+				"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void onSave()
+	{		
+		onSaveAs(_currentFile);
+	}
+
+	private void onSaveAs(File file)
 	{
 		try
 		{
-			File file = new File("c:\\Temp\\model.xml");
-			NetworkSerializer serializer = new NetworkSerializer(_networkView);
-			serializer.serialize(file);
+			if (file == null)
+			{
+				JFileChooser dialog = new JFileChooser(_currentFile);
+				dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				dialog.setMultiSelectionEnabled(false);
+				dialog.setAcceptAllFileFilterUsed(false);
+				dialog.setDialogTitle("Save As");
+				dialog.setFileFilter(createFileFilter());
+				if (dialog.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+				{
+					file = dialog.getSelectedFile();
+				}
+			}
+			if (file != null)
+			{
+				NetworkSerializer serializer = new NetworkSerializer(_networkView);
+				serializer.serialize(file);
+				_currentFile = file;
+			}
 		}
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, 
+				String.format(
+					"Error occured while trying to save to file \"%s\":\n%s",
+					file, ex.getMessage()), 
+				"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -403,10 +544,12 @@ class MainWindow extends JFrame
 		{
 			if (_editMenuConnect.isSelected()) _networkView.setMode(Mode.Connect);
 			else _networkView.setMode(Mode.Move);
+			_toolBarEditMode.setToolTipText("Switch To View Mode");
 		}
 		else
 		{
 			_networkView.setMode(Mode.View);
+			_toolBarEditMode.setToolTipText("Switch To Edit Mode");
 		}
 		if (_editMenuMode.isSelected() != allow) _editMenuMode.setSelected(allow);
 		if (_toolBarEditMode.isSelected() != allow) _toolBarEditMode.setSelected(allow);
@@ -419,16 +562,20 @@ class MainWindow extends JFrame
 		_toolBarEditInsert.setEnabled(allow);
 	}
 
-	protected void onEditModeSelected(JRadioButtonMenuItem editMenuModeItem)
+	protected void onEditModeSelected(Mode mode)
 	{
-		if (editMenuModeItem.equals(_editMenuMove))
+		_networkView.setMode(mode);
+		switch (mode)
 		{
-			_networkView.setMode(Mode.Move);
+		case Move:
+			_editMenuMove.setSelected(true);
+			_toolBarEditModeType.setSelectedItem(_toolBarEditModeTypeMove);
+			break;
+		case Connect:
+			_editMenuConnect.setSelected(true);
+			_toolBarEditModeType.setSelectedItem(_toolBarEditModeTypeConnect);
+			break;
 		}
-		else if (editMenuModeItem.equals(_editMenuConnect))
-		{
-			_networkView.setMode(Mode.Connect);
-		} 
 	}
 	
 	protected void onInsertNewNode()
@@ -445,6 +592,27 @@ class MainWindow extends JFrame
 	protected void onDeleteSelectedShapes()
 	{
 		_networkView.removeSelectedShape();
+	}
+	
+	// #######################################################################
+	// ##########                  Utility methods                  ##########
+	// #######################################################################
+	
+	private FileFilter createFileFilter()
+	{
+		return new FileFilter()
+		{
+			@Override
+			public String getDescription()
+			{
+				return "Network Model";
+			}
+			@Override
+			public boolean accept(File file)
+			{
+				return file.isDirectory() || file.getName().toLowerCase().endsWith(".nas");
+			}
+		};
 	}
 	
 	// #######################################################################
