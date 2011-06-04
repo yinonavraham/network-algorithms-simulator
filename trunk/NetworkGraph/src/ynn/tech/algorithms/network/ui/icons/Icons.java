@@ -80,6 +80,31 @@ public class Icons
 		return getIcon("Element_Delete16.png");
 	}
 	
+	public static Icon getPlay()
+	{
+		return getIcon("play.png");
+	}
+	
+	public static Icon getStop()
+	{
+		return getIcon("Stop.png");
+	}
+	
+	public static Icon getRewind()
+	{
+		return getIcon("Rewind.png");
+	}
+	
+	public static Icon getForward()
+	{
+		return getIcon("Forward.png");
+	}
+	
+	public static Icon getAbout()
+	{
+		return getIcon("About.png");
+	}
+	
 	public static Image getNetwork()
 	{
 		return new ImageIcon(getResource("network.png")).getImage();
