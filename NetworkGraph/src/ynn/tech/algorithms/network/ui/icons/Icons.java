@@ -82,7 +82,7 @@ public class Icons
 	
 	public static Icon getPlay()
 	{
-		return getIcon("play.png");
+		return getIcon("Play.png");
 	}
 	
 	public static Icon getStop()

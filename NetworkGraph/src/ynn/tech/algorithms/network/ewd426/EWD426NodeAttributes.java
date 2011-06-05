@@ -1,9 +1,9 @@
-package ynn.tech.algorithms.network.dtr74;
+package ynn.tech.algorithms.network.ewd426;
 
 import ynn.network.model.Attribute;
 import ynn.tech.algorithms.network.NodeAttributes;
 
-public class Dtr74NodeAttributes implements NodeAttributes
+public class EWD426NodeAttributes implements NodeAttributes
 {
 	private static Attribute[] __attributes = new Attribute[0]; 
 

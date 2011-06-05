@@ -39,10 +39,10 @@ import ynn.network.ui.NodeShape;
 import ynn.network.util.NetworkSerializer;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
-import ynn.tech.algorithms.network.dtr74.Dtr74Descriptor;
+import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
 import ynn.tech.algorithms.network.ui.icons.Icons;
 
-class MainWindow extends JFrame
+public class MainWindow extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -95,7 +95,7 @@ class MainWindow extends JFrame
 	private File _currentFile = null;
     private AlgorithmDescriptor[] _algDescriptors = new AlgorithmDescriptor[] {
     	new Aky90Descriptor(),
-    	new Dtr74Descriptor()
+    	new EWD426Descriptor()
     };
     private AlgorithmDescriptor _algDescriptor = null;
 

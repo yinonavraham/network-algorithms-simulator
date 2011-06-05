@@ -31,7 +31,7 @@ public class Aky90Descriptor implements AlgorithmDescriptor
 	{
 		return 
 			"A self stabilizing protocol for constructing a rooted spanning tree in an arbitrary asynchronous " +
-			"network of processors that communicate through sha~ed memory is presented. The " +
+			"network of processors that communicate through shared memory is presented. The " +
 			"processors have unique identifiers but are otherwise identical. The network topology is assumed " +
 			"to be dynamic, that is, edges can join or leave the computation before it eventually stabilizes.";
 	}

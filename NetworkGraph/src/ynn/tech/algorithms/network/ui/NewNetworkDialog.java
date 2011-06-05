@@ -113,6 +113,7 @@ public class NewNetworkDialog extends JDialog
 				{
 					_btnAccept.setEnabled(true);
 					_fldDescription.setText(((AlgorithmDescriptor)_list.getSelectedValue()).getDescription());
+					_fldDescription.setCaretPosition(0);
 				}
 			}
 		});
