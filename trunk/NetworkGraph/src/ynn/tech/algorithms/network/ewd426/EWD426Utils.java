@@ -1,9 +1,9 @@
-package ynn.tech.algorithms.network.dtr74;
+package ynn.tech.algorithms.network.ewd426;
 
 import ynn.network.model.Node;
 import ynn.tech.algorithms.network.AlgorithmUtils;
 
-public class Dtr74Utils implements AlgorithmUtils
+public class EWD426Utils implements AlgorithmUtils
 {
 
 	@Override
