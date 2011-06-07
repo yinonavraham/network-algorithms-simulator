@@ -8,9 +8,11 @@ import ynn.tech.algorithms.network.SetNodeAttributeCommand;
 public class SetAsRootCommand implements Command
 {
 	private CompositeCommand _command;
+	private Node _node;
 	
 	public SetAsRootCommand(Node node)
 	{
+		_node = node;
 		_command = new CompositeCommand();
 		Aky90Node akyNode = new Aky90Node(node);
 		Aky90NodeAttributes attr = new Aky90NodeAttributes();
@@ -37,4 +39,9 @@ public class SetAsRootCommand implements Command
 		return _command.canUndo();
 	}
 
+	@Override
+	public String toString()
+	{
+		return String.format("%s- Set as root", _node);
+	}
 }

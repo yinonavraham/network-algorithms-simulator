@@ -1,9 +1,13 @@
 package ynn.tech.algorithms.network.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -17,17 +21,22 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 
 import ynn.network.adapter.NetworkAdapter;
@@ -38,6 +47,7 @@ import ynn.network.ui.NetworkView.Mode;
 import ynn.network.ui.NodeShape;
 import ynn.network.util.NetworkSerializer;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
+import ynn.tech.algorithms.network.AlgorithmExecuter;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
 import ynn.tech.algorithms.network.ui.icons.Icons;
@@ -84,12 +94,17 @@ public class MainWindow extends JFrame
 	private JButton _toolBarPlayStop;
 	private JButton _toolBarPlayNext;
 	private JButton _toolBarPlayPrev;
+	private JLabel _toolBarPlayTime;
 
 	private JPanel _contentPanel;
+	private JSplitPane _splitter;
+	private JTextArea _console;
+	private JTabbedPane _tabbedPane;
 	
     private NetworkView _networkView;
     private NetworkModel _networkModel;
     private NetworkAdapter _networkAdapter;
+    private AlgorithmExecuter _algExececuter = null;
     
     private int _nodeId = 1;
 	private File _currentFile = null;
@@ -107,7 +122,6 @@ public class MainWindow extends JFrame
         setLocationRelativeTo(null);
         setIconImage(Icons.getNetwork());
 		initializeControls();
-		_algDescriptor = new Aky90Descriptor();
 	}
 	
 	// #######################################################################
@@ -118,13 +132,41 @@ public class MainWindow extends JFrame
 	{
 		_contentPanel = new JPanel();
 		_contentPanel.setLayout(new BorderLayout());
-		setContentPane(_contentPanel);
+		_contentPanel.setPreferredSize(new Dimension(10,10));
+		initializeTabs();
+		_splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT,true,_contentPanel,_tabbedPane);
+		setContentPane(_splitter);
+		addComponentListener(new ComponentAdapter()
+		{
+			@Override
+			public void componentShown(ComponentEvent e)
+			{
+				_splitter.setDividerLocation(0.7);
+			}
+		});
 		initializeMenu();
 		initializeToolBar();
 		//initializeNetworkView();
 		enableEdit(false);
 		enablePlay(false);
 		enableSave(false);
+	}
+
+	private void initializeTabs()
+	{
+		_tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		// Console Tab
+		_console = new JTextArea();
+		_console.setRows(5);
+		_console.setBorder(BorderFactory.createLoweredBevelBorder());
+		_console.setEditable(false);
+		_console.setWrapStyleWord(true);
+		_console.setLineWrap(true);
+		_console.setAutoscrolls(true);
+		_console.setFont((new JList()).getFont());
+		_tabbedPane.addTab("Console", new JScrollPane(_console));
+		// Attributes Tab
+		_tabbedPane.addTab("Attributes", new JPanel());
 	}
 
 	private void initializeNetworkView()
@@ -135,6 +177,7 @@ public class MainWindow extends JFrame
         _networkAdapter = null;
         _networkModel = new NetworkModel();
         _networkView = new NetworkView();
+        _networkView.setBackground(Color.WHITE);
         _networkAdapter = new NetworkAdapter();
         _networkAdapter.attach(_networkModel);
         _networkAdapter.attach(_networkView);
@@ -337,6 +380,11 @@ public class MainWindow extends JFrame
 			}
 		});
 		_toolBarPlay.add(_toolBarPlayNext);
+		
+		_toolBarPlayTime = new JLabel();
+		_toolBarPlayTime.setBorder(BorderFactory.createEtchedBorder());
+		updateTime();
+		_toolBarPlay.add(_toolBarPlayTime);
 		
 		_toolBarsPanel.add(_toolBarPlay);
 	}
@@ -614,6 +662,20 @@ public class MainWindow extends JFrame
 		_toolBarFileSave.setEnabled(enabled);
 	}
 
+	private void updateTime()
+	{
+		int time = _algExececuter == null ? 0 : _algExececuter.getTime();
+		_toolBarPlayTime.setText(String.format("t = %d", time));
+	}
+	
+	private void updateConsole(String[] strings)
+	{
+		_console.setText("");
+		if (strings != null)
+			for (String s : strings) _console.append(s + "\n");
+		_console.setCaretPosition(0);
+	}
+
 	// #######################################################################
 	// ##########                 on event methods                  ##########
 	// #######################################################################
@@ -627,6 +689,8 @@ public class MainWindow extends JFrame
 			_nodeId = 1;
 			_algDescriptor = descriptor;
 			initializeNetworkView();
+			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel);
+			updateTime();
 			validate();
 			enableEdit(true);
 			enableSave(true);
@@ -777,22 +841,70 @@ public class MainWindow extends JFrame
 	
 	private void onStartSimulation()
 	{
+		// Simulation tool bar
+		_toolBarPlayNext.setEnabled(false);
+		_toolBarPlayPrev.setEnabled(false);
+		_toolBarPlayStart.setEnabled(false);
+		_toolBarPlayStop.setEnabled(true);
+		_toolBarPlayStop.requestFocus();
+		// Simulation menu
+		_playMenuNext.setEnabled(false);
+		_playMenuPrev.setEnabled(false);
+		_playMenuStart.setEnabled(false);
+		_playMenuStop.setEnabled(true);
+		// Edit
+		_toolBarEditMode.setEnabled(false);
+		_editMenu.setEnabled(false);
+		// File
+		_toolBarFileNew.setEnabled(false);
+		_toolBarFileOpen.setEnabled(false);
+		_toolBarFileSave.setEnabled(false);
+		_fileMenu.setEnabled(false);
 		// TODO
 	}
 	
 	private void onStopSimulation()
 	{
+		// Simulation tool bar
+		_toolBarPlayNext.setEnabled(true);
+		_toolBarPlayPrev.setEnabled(true);
+		_toolBarPlayStart.setEnabled(true);
+		_toolBarPlayStop.setEnabled(false);
+		_toolBarPlayStart.requestFocus();
+		// Simulation menu
+		_playMenuNext.setEnabled(true);
+		_playMenuPrev.setEnabled(true);
+		_playMenuStart.setEnabled(true);
+		_playMenuStop.setEnabled(false);
+		// Edit
+		_toolBarEditMode.setEnabled(true);
+		_editMenu.setEnabled(true);
+		// File
+		_toolBarFileNew.setEnabled(true);
+		_toolBarFileOpen.setEnabled(true);
+		_toolBarFileSave.setEnabled(true);
+		_fileMenu.setEnabled(true);
 		// TODO
 	}
 	
 	private void onSimulationNextStep()
 	{
-		// TODO
+		if (_algExececuter != null)
+		{
+			String[] strings = _algExececuter.stepForward();
+			updateTime();
+			updateConsole(strings);
+		}
 	}
-	
+
 	private void onSimulationStepBack()
 	{
-		// TODO
+		if (_algExececuter != null)
+		{
+			_algExececuter.stepBack();
+			updateTime();
+			updateConsole(null);
+		}
 	}
 	
 	private void onAbout()
@@ -819,29 +931,5 @@ public class MainWindow extends JFrame
 				return file.isDirectory() || file.getName().toLowerCase().endsWith(".nas");
 			}
 		};
-	}
-	
-	// #######################################################################
-	// ##########                       main                        ##########
-	// #######################################################################
-
-	public static void main(String[] args)
-	{
-		try
-		{
-			SwingUtilities.invokeAndWait(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					MainWindow window = new MainWindow();
-					window.setVisible(true);
-				}
-			});
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
 	}
 }

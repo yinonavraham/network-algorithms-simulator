@@ -8,9 +8,11 @@ import ynn.tech.algorithms.network.SetNodeAttributeCommand;
 public class ResetRequestVarsCommand implements Command
 {
 	private CompositeCommand _command;
+	private Node _node;
 	
 	public ResetRequestVarsCommand(Node node)
 	{
+		_node = node;
 		_command = new CompositeCommand();
 		Aky90NodeAttributes attr = new Aky90NodeAttributes();
 		_command.add(new SetNodeAttributeCommand(
@@ -41,4 +43,9 @@ public class ResetRequestVarsCommand implements Command
 		return _command.canUndo();
 	}
 
+	@Override
+	public String toString()
+	{
+		return String.format("%s- Reset Request varialbes", _node);
+	}
 }
