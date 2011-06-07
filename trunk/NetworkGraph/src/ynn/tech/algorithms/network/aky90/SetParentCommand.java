@@ -26,5 +26,10 @@ public class SetParentCommand extends SetNodeAttributeCommand
 	{
 		new Aky90Node(_node).setParent(_oldParentId);
 	}
-
+	
+	@Override
+	public String toString()
+	{
+		return String.format("%s- Change parent: %s -> %s", _node, _oldParentId, _newParentId);
+	}
 }

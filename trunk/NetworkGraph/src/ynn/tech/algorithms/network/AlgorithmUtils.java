@@ -5,4 +5,5 @@ import ynn.network.model.Node;
 public interface AlgorithmUtils
 {
 	void initNodeAttributes(Node node); 
+	NetworkAlgorithm createAlgorithm();
 }

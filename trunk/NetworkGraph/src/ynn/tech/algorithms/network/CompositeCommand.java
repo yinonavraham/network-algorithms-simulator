@@ -21,6 +21,11 @@ public class CompositeCommand implements Command
 	{
 		_commands.remove(cmd);
 	}
+	
+	public Command[] getCommands()
+	{
+		return _commands.toArray(new Command[_commands.size()]);
+	}
 
 	@Override
 	public void execute()

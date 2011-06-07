@@ -132,6 +132,7 @@ public class NewNetworkDialog extends JDialog
 		_fldDescription.setWrapStyleWord(true);
 		_fldDescription.setLineWrap(true);
 		_fldDescription.setAutoscrolls(true);
+		_fldDescription.setFont(_list.getFont());
 		panel.add(new JScrollPane(_fldDescription),BorderLayout.CENTER);
 		contentPanel.add(panel,BorderLayout.SOUTH);
 		

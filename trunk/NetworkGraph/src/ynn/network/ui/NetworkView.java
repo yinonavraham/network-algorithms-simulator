@@ -1,5 +1,6 @@
 package ynn.network.ui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -360,5 +361,21 @@ public class NetworkView extends JPanel
 			if (shape instanceof ConnectorShape) connectors.add((ConnectorShape)shape);
 		}
 		return connectors;
+	}
+	
+	@Override
+	public Dimension getPreferredSize()
+	{
+		int width = 0;
+		int height = 0;
+		int x, y;
+		for (AbstractShape shape : _shapes)
+		{
+			x = (int)shape.getCenter().getX();
+			y = (int)shape.getCenter().getY();
+			width = Math.max(width, x + shape.getDimension().width / 2);
+			height = Math.max(width, y + shape.getDimension().height / 2);
+		}
+		return new Dimension(width+5, height+5);
 	}
 }

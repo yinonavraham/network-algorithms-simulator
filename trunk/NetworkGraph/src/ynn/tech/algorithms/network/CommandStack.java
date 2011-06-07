@@ -41,7 +41,7 @@ public class CommandStack
 		if (canUndo())
 		{
 			Command command = _commands.get(_currentCmd);
-			command.execute();
+			command.undo();
 			_currentCmd--;
 		}
 	}

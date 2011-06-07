@@ -1,6 +1,7 @@
 package ynn.network.ui;
 
 import java.awt.BasicStroke;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -228,6 +229,14 @@ public class ConnectorShape extends AbstractShape implements IShapeListener
 			}
 		}
 		return String.format("%s %s %s", txt1, op, txt2);
+	}
+
+	@Override
+	public Dimension getDimension()
+	{
+		int width = (int)Math.abs(_line.x2 - _line.x1);
+		int height = (int)Math.abs(_line.y2 - _line.y1);
+		return new Dimension(width, height);
 	}
 
 }

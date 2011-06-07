@@ -1,6 +1,7 @@
 package ynn.network.ui;
 
 import java.awt.BasicStroke;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
@@ -86,4 +87,11 @@ public class NodeShape extends AbstractShape
 		return String.format("(%s)", getText());
 	}
 
+	@Override
+	public Dimension getDimension()
+	{
+		int width = (int)_ellipse.width;
+		int height = (int)_ellipse.height;
+		return new Dimension(width, height);
+	}
 }
