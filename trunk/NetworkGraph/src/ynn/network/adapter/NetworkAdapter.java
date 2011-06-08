@@ -12,6 +12,7 @@ import ynn.network.ui.INetworkViewListener;
 import ynn.network.ui.NetworkView;
 import ynn.network.ui.NodeShape;
 import ynn.network.ui.NodesEvent;
+import ynn.network.ui.SelectionChangedEvent;
 
 public class NetworkAdapter
 {
@@ -48,6 +49,12 @@ public class NetworkAdapter
 			public void connectorsChanged(ConnectorsEvent e)
 			{
 				handleViewConnectorsChanged(e);
+			}
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent e)
+			{
+				handleViewSelectionChanged(e);
 			}
 		};
 	}
@@ -153,6 +160,11 @@ public class NetworkAdapter
 			}
 			break;
 		}
+	}
+
+	protected void handleViewSelectionChanged(SelectionChangedEvent e)
+	{
+		// TODO
 	}
 
 	protected void handleModelNetworkChanged(NetworkEvent e)

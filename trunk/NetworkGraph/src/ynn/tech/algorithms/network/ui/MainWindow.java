@@ -42,14 +42,20 @@ import javax.swing.filechooser.FileFilter;
 import ynn.network.adapter.NetworkAdapter;
 import ynn.network.model.NetworkModel;
 import ynn.network.model.Node;
+import ynn.network.ui.AbstractShape;
+import ynn.network.ui.ConnectorsEvent;
+import ynn.network.ui.INetworkViewListener;
 import ynn.network.ui.NetworkView;
 import ynn.network.ui.NetworkView.Mode;
 import ynn.network.ui.NodeShape;
+import ynn.network.ui.NodesEvent;
+import ynn.network.ui.SelectionChangedEvent;
 import ynn.network.util.NetworkSerializer;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.AlgorithmExecuter;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
+import ynn.tech.algorithms.network.ui.attributes.AttributesView;
 import ynn.tech.algorithms.network.ui.icons.Icons;
 
 public class MainWindow extends JFrame
@@ -99,6 +105,7 @@ public class MainWindow extends JFrame
 	private JPanel _contentPanel;
 	private JSplitPane _splitter;
 	private JTextArea _console;
+	private AttributesView _attributesView;
 	private JTabbedPane _tabbedPane;
 	
     private NetworkView _networkView;
@@ -164,9 +171,10 @@ public class MainWindow extends JFrame
 		_console.setLineWrap(true);
 		_console.setAutoscrolls(true);
 		_console.setFont((new JList()).getFont());
-		_tabbedPane.addTab("Console", new JScrollPane(_console));
+		_tabbedPane.addTab("Console", Icons.getConsole(), new JScrollPane(_console));
 		// Attributes Tab
-		_tabbedPane.addTab("Attributes", new JPanel());
+		_attributesView = new AttributesView();
+		_tabbedPane.addTab("Attributes", Icons.getClipboard(), _attributesView);
 	}
 
 	private void initializeNetworkView()
@@ -182,6 +190,25 @@ public class MainWindow extends JFrame
         _networkAdapter.attach(_networkModel);
         _networkAdapter.attach(_networkView);
         _contentPanel.add(_networkView,BorderLayout.CENTER);
+        _networkView.addListener(new INetworkViewListener()
+		{
+			@Override
+			public void selectionChanged(SelectionChangedEvent e)
+			{
+				AbstractShape shape = e.getFirstNewSelection();
+				Node node = null;
+				if (shape instanceof NodeShape)
+				{
+					Object data = ((NodeShape)shape).getData();
+					if (data instanceof Node) node = (Node)data;
+				}
+				_attributesView.setNodeAttributes(node);
+			}
+			@Override
+			public void nodesChanged(NodesEvent e) {}
+			@Override
+			public void connectorsChanged(ConnectorsEvent e) {}
+		});
 	}
 
 	private void initializeToolBar()
@@ -805,6 +832,7 @@ public class MainWindow extends JFrame
 		_toolBarEditInsert.setEnabled(allow);
 		_toolBarEditModeType.setEnabled(allow);
 		enablePlay(!allow);
+		_attributesView.setEnabled(allow);
 	}
 
 	protected void onEditModeSelected(Mode mode)
