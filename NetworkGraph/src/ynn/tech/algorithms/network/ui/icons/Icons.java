@@ -105,6 +105,16 @@ public class Icons
 		return getIcon("About.png");
 	}
 	
+	public static Icon getClipboard()
+	{
+		return getIcon("Clipboard.png");
+	}
+	
+	public static Icon getConsole()
+	{
+		return getIcon("Console.png");
+	}
+	
 	public static Image getNetwork()
 	{
 		return new ImageIcon(getResource("network.png")).getImage();

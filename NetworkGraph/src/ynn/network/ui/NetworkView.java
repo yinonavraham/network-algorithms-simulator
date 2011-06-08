@@ -194,6 +194,8 @@ public class NetworkView extends JPanel
 
 	private void setSelectedShape(AbstractShape shape)
 	{
+		AbstractShape oldSelection = _selectedShape;
+		AbstractShape newSelection = shape;
 		if (_selectedShape != null)
 		{
 			_selectedShape.setSelected(false);
@@ -204,6 +206,7 @@ public class NetworkView extends JPanel
 			_selectedShape.setSelected(true);
 		}
 		repaint();
+		fireSelectionChanged(oldSelection, newSelection);
 	}
 	
 	public AbstractShape[] getSelectedShapes()
@@ -341,6 +344,18 @@ public class NetworkView extends JPanel
 	{
 		ConnectorsEvent e = new ConnectorsEvent(ConnectorsEvent.DIRECTION_CHANGED, connectors);
 		for (INetworkViewListener l : _listeners) l.connectorsChanged(e);
+	}
+
+//	private void fireSelectionChanged(AbstractShape[] oldSelection, AbstractShape[] newSelection)
+//	{
+//		SelectionChangedEvent e = new SelectionChangedEvent(oldSelection, newSelection); 
+//		for (INetworkViewListener l : _listeners) l.selectionChanged(e);
+//	}
+
+	private void fireSelectionChanged(AbstractShape oldSelection, AbstractShape newSelection)
+	{
+		SelectionChangedEvent e = new SelectionChangedEvent(oldSelection, newSelection); 
+		for (INetworkViewListener l : _listeners) l.selectionChanged(e);
 	}
 	
 	public List<NodeShape> getNodes()
