@@ -42,6 +42,6 @@ public class SetAsRootCommand implements Command
 	@Override
 	public String toString()
 	{
-		return String.format("%s- Set as root", _node);
+		return String.format("%s: Set as root", _node);
 	}
 }

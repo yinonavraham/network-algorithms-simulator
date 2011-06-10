@@ -30,6 +30,6 @@ public class SetParentCommand extends SetNodeAttributeCommand
 	@Override
 	public String toString()
 	{
-		return String.format("%s- Change parent: %s -> %s", _node, _oldParentId, _newParentId);
+		return String.format("%s: Change parent: %s -> %s", _node, _oldParentId, _newParentId);
 	}
 }

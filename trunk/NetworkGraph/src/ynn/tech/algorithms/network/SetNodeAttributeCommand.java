@@ -56,6 +56,6 @@ public class SetNodeAttributeCommand implements Command
 	@Override
 	public String toString()
 	{  
-		return String.format("%s: Set %s - %s -> %s", _node, _attr, ""+_oldValue, ""+_value);
+		return String.format("%s: Set %s: %s -> %s", _node, _attr, ""+_oldValue, ""+_value);
 	}
 }

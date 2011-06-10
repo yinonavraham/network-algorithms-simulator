@@ -207,19 +207,26 @@ public class NetworkAdapter
 			Node node = e.getNodes().get(0);
 			Node neighbor = e.getNodes().get(1);
 			connector = findConnectorShapeOf(node, neighbor);
-			connector.setDirection(directionToConnectorShapeDirection(node.getNeighborDirection(neighbor)));
+			connector.setDirection(directionToConnectorShapeDirection(connector,node,neighbor));
 			break;
 		}
 	}
 
-	private ConnectorShape.Direction directionToConnectorShapeDirection(Direction direction)
+	private ConnectorShape.Direction directionToConnectorShapeDirection(
+		ConnectorShape connector, Node node, Node neighbor)
 	{
+		Direction direction = node.getNeighborDirection(neighbor);
 		if (direction == null) return null;
+		Object data1 = connector.getVertex1().getData();
 		switch (direction)
 		{
 			case Both: return ConnectorShape.Direction.Both;
-			case Default: return ConnectorShape.Direction.Default;
-			case Other: return ConnectorShape.Direction.Other;
+			case Default:
+				if (node.equals(data1)) return ConnectorShape.Direction.Default;
+				else return ConnectorShape.Direction.Other;
+			case Other: 
+				if (node.equals(data1)) return ConnectorShape.Direction.Other;
+				else return ConnectorShape.Direction.Default;
 			case None: return ConnectorShape.Direction.None;
 		}
 		return null;

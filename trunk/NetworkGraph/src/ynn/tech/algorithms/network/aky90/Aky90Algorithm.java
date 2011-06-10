@@ -17,17 +17,25 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	@Override
 	public void performStep(StepContext context)
 	{
-		for (Node node : context.getNetwork().getNodes())
+		for (Node vNode : context.getNetwork().getNodes())
 		{
-			Aky90Node v = (Aky90Node)node;
-			action1(context,v); 
-			action2(context,v);
-			action3(context,v);
-			action4(context,v);
-			action5(context,v);
-			action6(context,v);
-			action7(context,v);
-			action8(context,v);
+			/*
+			 * The program at node v:
+			 * do forever: read next neighbor information and perform actions 1-8
+			 */
+			Aky90Node v = (Aky90Node)vNode;
+			for (Node uNode : v.getNeighbors())
+			{
+				Aky90Node u = (Aky90Node)uNode;
+				action1(context,v); 
+				action2(context,v,u);
+				action3(context,v);
+				action4(context,v);
+				action5(context,v);
+				action6(context,v);
+				action7(context,v,u);
+				action8(context,v,u);
+			}
 		}
 	}
 	
@@ -43,11 +51,12 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		return guard;
 	}
 	
-	private boolean action2(StepContext context, Aky90Node v)
+	private boolean action2(StepContext context, Aky90Node v, Aky90Node u)
 	{
-		Aky90Node u = v.getNeghiborWithMaxRoot();
+		Aky90Node x = v.getNeghiborWithMaxRoot();
 		boolean guard = 
 			condition1Prime(v) &&
+			u.getRootId().equals(x.getRootId()) &&
 			u.getRootId().compareToIgnoreCase(v.getRootId()) > 0;
 		if (guard == true)
 		{
@@ -158,14 +167,13 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		return guard;
 	}
 	
-	private boolean action7(StepContext context, Aky90Node v)
+	private boolean action7(StepContext context, Aky90Node v, Aky90Node u)
 	{
-		Aky90Node u = (Aky90Node)v.getParent();
 		boolean guard = 
 			condition1(v) &&
 			condition2Prime(v) &&
+			v.getTo().equals(v.getParentId()) &&
 			v.getTo().equals(u.getId()) &&
-			v.getParentId().equals(u.getId()) &&
 			u.getDirection().equals(DirectionEnum.Grant) &&
 			v.getDirection().equals(DirectionEnum.Ask) &&
 			u.getRequest().equals(v.getRequest()) &&
@@ -178,11 +186,8 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		return guard;
 	}
 	
-	private boolean action8(StepContext context, Aky90Node v)
+	private boolean action8(StepContext context, Aky90Node v, Aky90Node u)
 	{
-		Node uNode = v;
-		if (!v.getId().equals(v.getTo())) uNode = v.getFirstNeighborByName(v.getTo());
-		Aky90Node u = (Aky90Node)uNode;
 		boolean guard = 
 			condition1Prime(v) &&
 			!condition1(v) &&
@@ -225,7 +230,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0) ||
 			v.getRootId().compareToIgnoreCase(v.getId()) > 0 && v.isNeighborOf(parent) && 
 			v.getRootId().equals(parent.getRootId()) && v.getDistance() == parent.getDistance() + 1) &&
-			v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) > 0;
+			v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) >= 0;
 	}
 	
 	/**

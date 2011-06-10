@@ -109,7 +109,7 @@ public class Aky90Node extends Node
 		{
 			Aky90Node akyNeighbor = (Aky90Node)neighbor;
 			String root = akyNeighbor.getRootId();
-			if (max == null || max.compareToIgnoreCase(root) > 0)
+			if (max == null || max.compareToIgnoreCase(root) < 0)
 			{
 				max = root;
 				result = akyNeighbor;

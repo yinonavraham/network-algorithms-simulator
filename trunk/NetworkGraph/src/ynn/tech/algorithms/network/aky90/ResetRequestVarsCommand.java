@@ -46,6 +46,6 @@ public class ResetRequestVarsCommand implements Command
 	@Override
 	public String toString()
 	{
-		return String.format("%s- Reset Request varialbes", _node);
+		return String.format("%s: Reset Request varialbes", _node);
 	}
 }
