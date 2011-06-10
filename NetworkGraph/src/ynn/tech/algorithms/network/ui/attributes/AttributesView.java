@@ -1,8 +1,9 @@
 package ynn.tech.algorithms.network.ui.attributes;
 
 import java.awt.BorderLayout;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -12,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import ynn.network.model.Node;
+import ynn.tech.algorithms.network.ui.ErrorOccurredListener;
 
 public class AttributesView extends JPanel
 {
@@ -20,10 +22,12 @@ public class AttributesView extends JPanel
 	private JTable _table;
 	private TableColumn _colName;
 	private TableColumn _colValue;
+	private List<ErrorOccurredListener> _errorListeners;
 	
 	public AttributesView()
 	{
 		super();
+		_errorListeners = new LinkedList<ErrorOccurredListener>();
 		setLayout(new BorderLayout());
 		_table = new JTable();
 		initEmptyTable();
@@ -57,20 +61,7 @@ public class AttributesView extends JPanel
 				@Override
 				public void valueParseError(NodeAttributesTableModelEvent e)
 				{
-					StringBuilder sb = new StringBuilder();
-					sb.append(e.getMessage());
-					if (e.getException() != null)
-					{
-						Throwable ex = e.getException();
-						while (ex != null)
-						{
-							sb.append("\nCaused by: ");
-							sb.append(ex);
-							ex = ex.getCause();
-						}
-					}
-					JOptionPane.showMessageDialog(
-						AttributesView.this, sb.toString(), "Error occurred", JOptionPane.ERROR_MESSAGE);
+					fireErrorOccurred(e.getException(), e.getMessage());
 				}
 			});
 			_table.setModel(model);
@@ -90,5 +81,23 @@ public class AttributesView extends JPanel
 		_colValue.setHeaderValue("Value");
 		_colValue.setIdentifier("Value");
 		_table.addColumn(_colValue);
+	}
+	
+	public void addErrorListener(ErrorOccurredListener l)
+	{
+		_errorListeners.add(l);
+	}
+	
+	public void removeErrorListener(ErrorOccurredListener l)
+	{
+		_errorListeners.remove(l);
+	}
+	
+	protected void fireErrorOccurred(Throwable e, String message)
+	{
+		for (int i = 0; i < _errorListeners.size(); i++)
+		{
+			_errorListeners.get(i).errorOccurred(this, e, message);
+		}
 	}
 }

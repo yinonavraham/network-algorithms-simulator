@@ -13,12 +13,12 @@ public class AlgorithmExecuter
 	private CommandStack _commands;
     private int _time;
 	
-	public AlgorithmExecuter(AlgorithmDescriptor descriptor, NetworkModel network)
+	public AlgorithmExecuter(AlgorithmDescriptor descriptor, NetworkModel network, CommandStack commands)
 	{
 		_descriptor = descriptor;
 		_algorithm = _descriptor.getUtilities().createAlgorithm();
 		_network = network;
-		_commands = new CommandStack();
+		_commands = commands;
 		_time = 0;
 	}
 	
