@@ -381,7 +381,7 @@ public class MainWindow extends JFrame
 		_toolBarPlay = new JToolBar();
 		
 		_toolBarPlayPrev = new JButton(Icons.getUndo());
-		_toolBarPlayPrev.setToolTipText("Step Back");
+		_toolBarPlayPrev.setToolTipText("Undo Step");
 		_toolBarPlayPrev.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -944,6 +944,7 @@ public class MainWindow extends JFrame
 	protected void onInsertNewNode()
 	{
 		NodeShape shape = new NodeShape();
+		shape.move(5*(_nodeId-1), 5*(_nodeId-1));
 		shape.setText(String.valueOf(_nodeId++));
 		Node node = _algDescriptor.getUtilities().createNode();
 		node.setName(shape.getText());
@@ -1013,6 +1014,7 @@ public class MainWindow extends JFrame
 			updateSimulationTime();
 			writeToConsole("Step at t = " + getSimulationTime());
 			writeToConsole(strings);
+			_networkView.repaint();
 		}
 	}
 
@@ -1023,6 +1025,7 @@ public class MainWindow extends JFrame
 			_algExececuter.stepBack();
 			writeToConsole("Undo step, back to t = " + getSimulationTime());
 			updateSimulationTime();
+			_networkView.repaint();
 		}
 	}
 	
