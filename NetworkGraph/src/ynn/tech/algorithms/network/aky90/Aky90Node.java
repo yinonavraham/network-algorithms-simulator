@@ -3,13 +3,11 @@ package ynn.tech.algorithms.network.aky90;
 import ynn.network.model.Direction;
 import ynn.network.model.Node;
 
-public class Aky90Node
-{
-	private Node _node;
-	
-	public Aky90Node(Node node)
+public class Aky90Node extends Node
+{	
+	public Aky90Node()
 	{
-		_node = node;
+		super();
 	}
 	
 	public void init()
@@ -23,84 +21,79 @@ public class Aky90Node
 		setDirection(Aky90NodeAttributes.UNDEFINED_DIRECTION);
 	}
 	
-	public Node getNode()
-	{
-		return _node; 
-	}
-	
 	public void setParent(Node parent)
 	{
-		Aky90Node akyParent = new Aky90Node(parent);
+		Aky90Node akyParent = (Aky90Node)parent;
 		setParent(akyParent.getId());
 	}
 	
 	public void setParent(String parentId)
 	{
-		Direction parentDir = _node.getNeighborDirection(getParent());
+		Direction parentDir = getNeighborDirection(getParent());
 		if (parentDir != null)
 		{
 			if (parentDir.equals(Direction.Default))
 			{
-				_node.setNeighborDirection(getParent(), Direction.None);
+				setNeighborDirection(getParent(), Direction.None);
 			}
 			else if (parentDir.equals(Direction.Both))
 			{
-				_node.setNeighborDirection(getParent(), Direction.Other);
+				setNeighborDirection(getParent(), Direction.Other);
 			}
 		}
-		_node.putAttribute(Aky90NodeAttributes.PARENT, parentId);
-		parentDir = _node.getNeighborDirection(getParent());
+		putAttribute(Aky90NodeAttributes.PARENT, parentId);
+		parentDir = getNeighborDirection(getParent());
 		if (parentDir != null)
 		{
 			if (parentDir.equals(Direction.None))
 			{
-				_node.setNeighborDirection(getParent(), Direction.Default);
+				setNeighborDirection(getParent(), Direction.Default);
 			}
 			else if (parentDir.equals(Direction.Other))
 			{
-				_node.setNeighborDirection(getParent(), Direction.Both);
+				setNeighborDirection(getParent(), Direction.Both);
 			}
 		}
 	}
 	
 	public String getParentId()
 	{
-		return (String)_node.getAttributeValue(Aky90NodeAttributes.PARENT);
+		return (String)getAttributeValue(Aky90NodeAttributes.PARENT);
 	}
 	
 	public String getRootId()
 	{
-		return (String)_node.getAttributeValue(Aky90NodeAttributes.ROOT);
+		return (String)getAttributeValue(Aky90NodeAttributes.ROOT);
 	}
 	
 	public Node getParent()
 	{
-		if (this.getId().equals(this.getParentId())) return _node;
-		else return _node.getFirstNeighborByName(getParentId());
+		if (this.getId().equals(this.getParentId())) return this;
+		else return getFirstNeighborByName(getParentId());
 	}
 	
 	public Node getRoot()
 	{
-		if (this.getId().equals(this.getRootId())) return _node;
-		else return _node.getFirstNeighborByName(getRootId());
+		if (this.getId().equals(this.getRootId())) return this;
+		else return getFirstNeighborByName(getRootId());
 	}
 	
 	public Integer getDistance()
 	{
-		return (Integer)_node.getAttributeValue(Aky90NodeAttributes.DISTANCE);
+		return (Integer)getAttributeValue(Aky90NodeAttributes.DISTANCE);
 	}
 	
 	public String getId()
 	{
-		return _node.getName();
+		return getName();
 	}
 
 	public String getMaxNeghiborRoot()
 	{
 		String max = null;
-		for (Node neighbor : _node.getNeighbors())
+		for (Node neighbor : getNeighbors())
 		{
-			Aky90Node akyNeighbor = new Aky90Node(neighbor);
+			Aky90Node akyNeighbor = (Aky90Node)neighbor;
 			String root = akyNeighbor.getRootId();
 			if (max == null) max = root;
 			else max = max.compareToIgnoreCase(root) > 0 ? max : root;
@@ -112,9 +105,9 @@ public class Aky90Node
 	{
 		String max = null;
 		Aky90Node result = null;
-		for (Node neighbor : _node.getNeighbors())
+		for (Node neighbor : getNeighbors())
 		{
-			Aky90Node akyNeighbor = new Aky90Node(neighbor);
+			Aky90Node akyNeighbor = (Aky90Node)neighbor;
 			String root = akyNeighbor.getRootId();
 			if (max == null || max.compareToIgnoreCase(root) > 0)
 			{
@@ -151,64 +144,54 @@ public class Aky90Node
 		return child.isChildOf(this);
 	}
 	
-	public boolean isNeighborOf(Node node)
-	{
-		return _node.isNeighborOf(node);
-	}
-	
-	public boolean isNeighborOf(Aky90Node node)
-	{
-		return _node.isNeighborOf(node.getNode());
-	}
-	
 	public void setRoot(String rootId)
 	{
-		_node.putAttribute(Aky90NodeAttributes.ROOT, rootId);
+		putAttribute(Aky90NodeAttributes.ROOT, rootId);
 	}
 	
 	public void setDistance(int distance)
 	{
-		_node.putAttribute(Aky90NodeAttributes.DISTANCE, distance);
+		putAttribute(Aky90NodeAttributes.DISTANCE, distance);
 	}
 	
 	public void setRequest(String nodeId)
 	{
-		_node.putAttribute(Aky90NodeAttributes.REQUEST, nodeId);
+		putAttribute(Aky90NodeAttributes.REQUEST, nodeId);
 	}
 	
 	public String getRequest()
 	{
-		return (String)_node.getAttributeValue(Aky90NodeAttributes.REQUEST);
+		return (String)getAttributeValue(Aky90NodeAttributes.REQUEST);
 	}
 	
 	public void setFrom(String nodeId)
 	{
-		_node.putAttribute(Aky90NodeAttributes.FROM, nodeId);
+		putAttribute(Aky90NodeAttributes.FROM, nodeId);
 	}
 	
 	public String getFrom()
 	{
-		return (String)_node.getAttributeValue(Aky90NodeAttributes.FROM);
+		return (String)getAttributeValue(Aky90NodeAttributes.FROM);
 	}
 	
 	public void setTo(String nodeId)
 	{
-		_node.putAttribute(Aky90NodeAttributes.TO, nodeId);
+		putAttribute(Aky90NodeAttributes.TO, nodeId);
 	}
 	
 	public String getTo()
 	{
-		return (String)_node.getAttributeValue(Aky90NodeAttributes.TO);
+		return (String)getAttributeValue(Aky90NodeAttributes.TO);
 	}
 	
 	public void setDirection(DirectionEnum direction)
 	{
-		_node.putAttribute(Aky90NodeAttributes.DIRECTION, direction);
+		putAttribute(Aky90NodeAttributes.DIRECTION, direction);
 	}
 	
 	public DirectionEnum getDirection()
 	{
-		return (DirectionEnum)_node.getAttributeValue(Aky90NodeAttributes.DIRECTION);
+		return (DirectionEnum)getAttributeValue(Aky90NodeAttributes.DIRECTION);
 	}
 	
 	public void setAsRoot()

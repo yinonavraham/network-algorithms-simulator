@@ -17,14 +17,14 @@ public class SetParentCommand extends SetNodeAttributeCommand
 	@Override
 	protected void onExecute()
 	{
-		_oldParentId = new Aky90Node(_node).getParentId();
-		new Aky90Node(_node).setParent(_newParentId);
+		_oldParentId = ((Aky90Node)_node).getParentId();
+		((Aky90Node)_node).setParent(_newParentId);
 	}
 	
 	@Override
 	protected void onUndo()
 	{
-		new Aky90Node(_node).setParent(_oldParentId);
+		((Aky90Node)_node).setParent(_oldParentId);
 	}
 	
 	@Override

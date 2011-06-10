@@ -76,8 +76,8 @@ public class MainWindow extends JFrame
 	private JMenuItem _editMenuInsertNode;
 	private JMenuItem _editMenuDelete;
 	private JMenu _playMenu;
-	private JMenuItem _playMenuStart;
-	private JMenuItem _playMenuStop;
+//	private JMenuItem _playMenuStart;
+//	private JMenuItem _playMenuStop;
 	private JMenuItem _playMenuNext;
 	private JMenuItem _playMenuPrev;
 	private JMenu _helpMenu;
@@ -96,8 +96,8 @@ public class MainWindow extends JFrame
 	private ComboBoxLabelItemModel _toolBarEditModeTypeMove;
 	private ComboBoxLabelItemModel _toolBarEditModeTypeConnect;
 	private JToolBar _toolBarPlay;
-	private JButton _toolBarPlayStart;
-	private JButton _toolBarPlayStop;
+//	private JButton _toolBarPlayStart;
+//	private JButton _toolBarPlayStop;
 	private JButton _toolBarPlayNext;
 	private JButton _toolBarPlayPrev;
 	private JLabel _toolBarPlayTime;
@@ -360,7 +360,7 @@ public class MainWindow extends JFrame
 	{
 		_toolBarPlay = new JToolBar();
 		
-		_toolBarPlayPrev = new JButton(Icons.getRewind());
+		_toolBarPlayPrev = new JButton(Icons.getUndo());
 		_toolBarPlayPrev.setToolTipText("Step Back");
 		_toolBarPlayPrev.addActionListener(new ActionListener()
 		{	
@@ -372,31 +372,31 @@ public class MainWindow extends JFrame
 		});
 		_toolBarPlay.add(_toolBarPlayPrev);
 		
-		_toolBarPlayStop = new JButton(Icons.getStop());
-		_toolBarPlayStop.setToolTipText("Stop Simulation");
-		_toolBarPlayStop.addActionListener(new ActionListener()
-		{	
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				onStopSimulation();
-			}
-		});
-		_toolBarPlay.add(_toolBarPlayStop);
+//		_toolBarPlayStop = new JButton(Icons.getStop());
+//		_toolBarPlayStop.setToolTipText("Stop Simulation");
+//		_toolBarPlayStop.addActionListener(new ActionListener()
+//		{	
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				onStopSimulation();
+//			}
+//		});
+//		_toolBarPlay.add(_toolBarPlayStop);
 		
-		_toolBarPlayStart = new JButton(Icons.getPlay());
-		_toolBarPlayStart.setToolTipText("Play Simulation");
-		_toolBarPlayStart.addActionListener(new ActionListener()
-		{	
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				onStartSimulation();
-			}
-		});
-		_toolBarPlay.add(_toolBarPlayStart);
+//		_toolBarPlayStart = new JButton(Icons.getPlay());
+//		_toolBarPlayStart.setToolTipText("Play Simulation");
+//		_toolBarPlayStart.addActionListener(new ActionListener()
+//		{	
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				onStartSimulation();
+//			}
+//		});
+//		_toolBarPlay.add(_toolBarPlayStart);
 		
-		_toolBarPlayNext = new JButton(Icons.getForward());
+		_toolBarPlayNext = new JButton(Icons.getStep());
 		_toolBarPlayNext.setToolTipText("Step Forward");
 		_toolBarPlayNext.addActionListener(new ActionListener()
 		{	
@@ -591,34 +591,34 @@ public class MainWindow extends JFrame
 		_playMenu.setMnemonic(KeyEvent.VK_P);
 		_menuBar.add(_playMenu);
 		// Play -> Start
-		_playMenuStart = new JMenuItem("Start", KeyEvent.VK_S);
-		_playMenuStart.setIcon(Icons.getPlay());
-		_playMenuStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-		_playMenuStart.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				onStartSimulation();
-			}
-		});
-		_playMenu.add(_playMenuStart);
+//		_playMenuStart = new JMenuItem("Start", KeyEvent.VK_S);
+//		_playMenuStart.setIcon(Icons.getPlay());
+//		_playMenuStart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+//		_playMenuStart.addActionListener(new ActionListener()
+//		{
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				onStartSimulation();
+//			}
+//		});
+//		_playMenu.add(_playMenuStart);
 		// Play -> Stop
-		_playMenuStop = new JMenuItem("Stop", KeyEvent.VK_T);
-		_playMenuStop.setIcon(Icons.getStop());
-		_playMenuStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, KeyEvent.CTRL_MASK));
-		_playMenuStop.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				onStopSimulation();
-			}
-		});
-		_playMenu.add(_playMenuStop);
+//		_playMenuStop = new JMenuItem("Stop", KeyEvent.VK_T);
+//		_playMenuStop.setIcon(Icons.getStop());
+//		_playMenuStop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, KeyEvent.CTRL_MASK));
+//		_playMenuStop.addActionListener(new ActionListener()
+//		{
+//			@Override
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				onStopSimulation();
+//			}
+//		});
+//		_playMenu.add(_playMenuStop);
 		// Play -> Next
 		_playMenuNext = new JMenuItem("Next", KeyEvent.VK_N);
-		_playMenuNext.setIcon(Icons.getForward());
+		_playMenuNext.setIcon(Icons.getStep());
 		_playMenuNext.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
 		_playMenuNext.addActionListener(new ActionListener()
 		{
@@ -631,7 +631,7 @@ public class MainWindow extends JFrame
 		_playMenu.add(_playMenuNext);
 		// Play -> Back
 		_playMenuPrev = new JMenuItem("Back", KeyEvent.VK_B);
-		_playMenuPrev.setIcon(Icons.getRewind());
+		_playMenuPrev.setIcon(Icons.getUndo());
 		_playMenuPrev.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 		_playMenuPrev.addActionListener(new ActionListener()
 		{
@@ -678,8 +678,8 @@ public class MainWindow extends JFrame
 		_playMenu.setEnabled(enabled);
 		_toolBarPlayNext.setEnabled(enabled);
 		_toolBarPlayPrev.setEnabled(enabled);
-		_toolBarPlayStart.setEnabled(enabled);
-		_toolBarPlayStop.setEnabled(enabled);
+//		_toolBarPlayStart.setEnabled(enabled);
+//		_toolBarPlayStop.setEnabled(enabled);
 	}
 	
 	private void enableSave(boolean enabled)
@@ -855,7 +855,7 @@ public class MainWindow extends JFrame
 	{
 		NodeShape shape = new NodeShape();
 		shape.setText(String.valueOf(_nodeId++));
-		Node node = new Node();
+		Node node = _algDescriptor.getUtilities().createNode();
 		node.setName(shape.getText());
 		_algDescriptor.getUtilities().initNodeAttributes(node);
 		shape.setData(node);
@@ -867,53 +867,53 @@ public class MainWindow extends JFrame
 		_networkView.removeSelectedShape();
 	}
 	
-	private void onStartSimulation()
-	{
-		// Simulation tool bar
-		_toolBarPlayNext.setEnabled(false);
-		_toolBarPlayPrev.setEnabled(false);
-		_toolBarPlayStart.setEnabled(false);
-		_toolBarPlayStop.setEnabled(true);
-		_toolBarPlayStop.requestFocus();
-		// Simulation menu
-		_playMenuNext.setEnabled(false);
-		_playMenuPrev.setEnabled(false);
-		_playMenuStart.setEnabled(false);
-		_playMenuStop.setEnabled(true);
-		// Edit
-		_toolBarEditMode.setEnabled(false);
-		_editMenu.setEnabled(false);
-		// File
-		_toolBarFileNew.setEnabled(false);
-		_toolBarFileOpen.setEnabled(false);
-		_toolBarFileSave.setEnabled(false);
-		_fileMenu.setEnabled(false);
-		// TODO
-	}
-	
-	private void onStopSimulation()
-	{
-		// Simulation tool bar
-		_toolBarPlayNext.setEnabled(true);
-		_toolBarPlayPrev.setEnabled(true);
-		_toolBarPlayStart.setEnabled(true);
-		_toolBarPlayStop.setEnabled(false);
-		_toolBarPlayStart.requestFocus();
-		// Simulation menu
-		_playMenuNext.setEnabled(true);
-		_playMenuPrev.setEnabled(true);
-		_playMenuStart.setEnabled(true);
-		_playMenuStop.setEnabled(false);
-		// Edit
-		_toolBarEditMode.setEnabled(true);
-		_editMenu.setEnabled(true);
-		// File
-		_toolBarFileNew.setEnabled(true);
-		_toolBarFileOpen.setEnabled(true);
-		_toolBarFileSave.setEnabled(true);
-		_fileMenu.setEnabled(true);
-		// TODO
-	}
+//	private void onStartSimulation()
+//	{
+//		// Simulation tool bar
+//		_toolBarPlayNext.setEnabled(false);
+//		_toolBarPlayPrev.setEnabled(false);
+////		_toolBarPlayStart.setEnabled(false);
+////		_toolBarPlayStop.setEnabled(true);
+////		_toolBarPlayStop.requestFocus();
+//		// Simulation menu
+//		_playMenuNext.setEnabled(false);
+//		_playMenuPrev.setEnabled(false);
+////		_playMenuStart.setEnabled(false);
+////		_playMenuStop.setEnabled(true);
+//		// Edit
+//		_toolBarEditMode.setEnabled(false);
+//		_editMenu.setEnabled(false);
+//		// File
+//		_toolBarFileNew.setEnabled(false);
+//		_toolBarFileOpen.setEnabled(false);
+//		_toolBarFileSave.setEnabled(false);
+//		_fileMenu.setEnabled(false);
+//		// TODO
+//	}
+//	
+//	private void onStopSimulation()
+//	{
+//		// Simulation tool bar
+//		_toolBarPlayNext.setEnabled(true);
+//		_toolBarPlayPrev.setEnabled(true);
+////		_toolBarPlayStart.setEnabled(true);
+////		_toolBarPlayStop.setEnabled(false);
+////		_toolBarPlayStart.requestFocus();
+//		// Simulation menu
+//		_playMenuNext.setEnabled(true);
+//		_playMenuPrev.setEnabled(true);
+////		_playMenuStart.setEnabled(true);
+////		_playMenuStop.setEnabled(false);
+//		// Edit
+//		_toolBarEditMode.setEnabled(true);
+//		_editMenu.setEnabled(true);
+//		// File
+//		_toolBarFileNew.setEnabled(true);
+//		_toolBarFileOpen.setEnabled(true);
+//		_toolBarFileSave.setEnabled(true);
+//		_fileMenu.setEnabled(true);
+//		// TODO
+//	}
 	
 	private void onSimulationNextStep()
 	{

@@ -8,16 +8,21 @@ public class Aky90Utils implements AlgorithmUtils
 {
 
 	@Override
-	public void initNodeAttributes(Node node)
-	{
-		Aky90Node akyNode = new Aky90Node(node);
-		akyNode.init();
-	}
-
-	@Override
 	public NetworkAlgorithm createAlgorithm()
 	{
 		return new Aky90Algorithm();
+	}
+
+	@Override
+	public Node createNode()
+	{
+		return new Aky90Node();
+	}
+
+	@Override
+	public void initNodeAttributes(Node node)
+	{
+		((Aky90Node)node).init();
 	}
 
 }

@@ -301,6 +301,6 @@ public class Node
 	@Override
 	public String toString()
 	{
-		return String.format("Node: %s", _name);
+		return String.format("Node %s", _name);
 	}
 }

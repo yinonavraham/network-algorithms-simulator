@@ -58,7 +58,7 @@ public class MainWindow extends JFrame
 				case KeyEvent.VK_INSERT:
 					NodeShape shape = new NodeShape();
 					shape.setText(String.valueOf(_nodeId++));
-					Node node = new Node();
+					Node node = algDescriptor.getUtilities().createNode();
 					node.setName(shape.getText());
 					algDescriptor.getUtilities().initNodeAttributes(node);
 					shape.setData(node);

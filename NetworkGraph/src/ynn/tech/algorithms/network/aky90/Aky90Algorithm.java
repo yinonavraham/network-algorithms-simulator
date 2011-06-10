@@ -19,7 +19,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	{
 		for (Node node : context.getNetwork().getNodes())
 		{
-			Aky90Node v = new Aky90Node(node);
+			Aky90Node v = (Aky90Node)node;
 			action1(context,v); 
 			action2(context,v);
 			action3(context,v);
@@ -38,7 +38,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			!condition1Prime(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new SetAsRootCommand(v.getNode()));
+			context.getCommands().add(new SetAsRootCommand(v));
 		}
 		return guard;
 	}
@@ -52,13 +52,13 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		if (guard == true)
 		{
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.REQUEST), v.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.REQUEST), v.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.FROM), v.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.FROM), v.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.TO), u.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.TO), u.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
 		}
 		return guard;
 	}
@@ -70,7 +70,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			!condition2(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new ResetRequestVarsCommand(v.getNode()));
+			context.getCommands().add(new ResetRequestVarsCommand(v));
 		}
 		return guard;
 	}
@@ -78,9 +78,9 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	private boolean action4(StepContext context, Aky90Node v)
 	{
 		Aky90Node w = null;
-		for (Node node : v.getNode().getNeighbors())
+		for (Node node : v.getNeighbors())
 		{
-			w = new Aky90Node(node);
+			w = (Aky90Node)node;
 			if (w.getDirection().equals(DirectionEnum.Ask) &&
 				w.getTo().equals(v.getId()) &&
 				w.getRequest().equals(w.getId()) &&
@@ -99,13 +99,13 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		if (guard == true)
 		{
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.REQUEST), w.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.REQUEST), w.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
+				v, _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
 		}
 		return guard;
 	}
@@ -113,9 +113,9 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	private boolean action5(StepContext context, Aky90Node v)
 	{
 		Aky90Node w = null;
-		for (Node node : v.getNode().getNeighbors())
+		for (Node node : v.getNeighbors())
 		{
-			w = new Aky90Node(node);
+			w = (Aky90Node)node;
 			if (w.getDirection().equals(DirectionEnum.Ask) &&
 				w.getTo().equals(v.getId()) &&
 				w.isChildOf(v))
@@ -132,13 +132,13 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		if (guard == true)
 		{
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.REQUEST), w.getRequest()));
+				v, _attr.getByName(Aky90NodeAttributes.REQUEST), w.getRequest()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
+				v, _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
+				v, _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
 		}
 		return guard;
 	}
@@ -153,14 +153,14 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		if (guard == true)
 		{
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
 		}
 		return guard;
 	}
 	
 	private boolean action7(StepContext context, Aky90Node v)
 	{
-		Aky90Node u = new Aky90Node(v.getParent());
+		Aky90Node u = (Aky90Node)v.getParent();
 		boolean guard = 
 			condition1(v) &&
 			condition2Prime(v) &&
@@ -173,16 +173,16 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		if (guard == true)
 		{
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
 		}
 		return guard;
 	}
 	
 	private boolean action8(StepContext context, Aky90Node v)
 	{
-		Node uNode = v.getNode();
-		if (!v.getId().equals(v.getTo())) uNode = v.getNode().getFirstNeighborByName(v.getTo());
-		Aky90Node u = new Aky90Node(uNode);
+		Node uNode = v;
+		if (!v.getId().equals(v.getTo())) uNode = v.getFirstNeighborByName(v.getTo());
+		Aky90Node u = (Aky90Node)uNode;
 		boolean guard = 
 			condition1Prime(v) &&
 			!condition1(v) &&
@@ -196,12 +196,12 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			v.getTo().equals(u.getId());
 		if (guard == true)
 		{
-			context.getCommands().add(new SetParentCommand(v.getNode(), u.getId()));
+			context.getCommands().add(new SetParentCommand(v, u.getId()));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.DISTANCE), u.getDistance()+1));
+				v, _attr.getByName(Aky90NodeAttributes.DISTANCE), u.getDistance()+1));
 			context.getCommands().add(new SetNodeAttributeCommand(
-				v.getNode(), _attr.getByName(Aky90NodeAttributes.ROOT), u.getRootId()));
-			context.getCommands().add(new ResetRequestVarsCommand(v.getNode()));
+				v, _attr.getByName(Aky90NodeAttributes.ROOT), u.getRootId()));
+			context.getCommands().add(new ResetRequestVarsCommand(v));
 		}
 		return guard;
 	}
@@ -220,7 +220,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	 */
 	private boolean condition1(Aky90Node v)
 	{
-		Aky90Node parent = new Aky90Node(v.getParent());
+		Aky90Node parent = (Aky90Node)v.getParent();
 		return (
 			(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0) ||
 			v.getRootId().compareToIgnoreCase(v.getId()) > 0 && v.isNeighborOf(parent) && 
@@ -241,7 +241,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	 */
 	private boolean condition1Prime(Aky90Node v)
 	{
-		Aky90Node parent = new Aky90Node(v.getParent());
+		Aky90Node parent = (Aky90Node)v.getParent();
 		return (
 			(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0) ||
 			v.getRootId().compareToIgnoreCase(v.getId()) > 0 && v.isNeighborOf(parent) && 
@@ -266,9 +266,9 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	 */
 	private boolean condition2Prime(Aky90Node v)
 	{
-		for (Node neighbor : v.getNode().getNeighbors())
+		for (Node neighbor : v.getNeighbors())
 		{
-			Aky90Node w = new Aky90Node(neighbor);
+			Aky90Node w = (Aky90Node)neighbor;
 			if ((w.getId().equals(w.getRootId()) &&
 				w.getId().equals(w.getRequest()) &&
 				w.getId().equals(w.getFrom()) &&
