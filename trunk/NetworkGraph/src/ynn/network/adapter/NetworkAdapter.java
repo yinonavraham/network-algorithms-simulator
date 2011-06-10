@@ -1,7 +1,9 @@
 package ynn.network.adapter;
 
+import ynn.network.model.DefaultNodeFactory;
 import ynn.network.model.Direction;
 import ynn.network.model.INetworkModelListener;
+import ynn.network.model.INodeFactory;
 import ynn.network.model.NetworkEvent;
 import ynn.network.model.NetworkModel;
 import ynn.network.model.Node;
@@ -20,6 +22,7 @@ public class NetworkAdapter
 	private NetworkModel _model = null;
 	private INetworkViewListener _viewListener;
 	private NetworkView _view = null;
+	private INodeFactory _nodeFactory = null;
 
 	public NetworkAdapter()
 	{
@@ -57,6 +60,17 @@ public class NetworkAdapter
 				handleViewSelectionChanged(e);
 			}
 		};
+	}
+	
+	public void setNodeFactory(INodeFactory factory)
+	{
+		_nodeFactory = factory;
+	}
+	
+	public INodeFactory getNodeFactory()
+	{
+		if (_nodeFactory == null) _nodeFactory = new DefaultNodeFactory();
+		return _nodeFactory; 
 	}
 
 	public void attach(NetworkModel model)
@@ -141,7 +155,7 @@ public class NetworkAdapter
 				Node node;
 				if (nodeObj == null)
 				{
-					node = new Node();
+					node = getNodeFactory().createNode();
 					nodeShape.setData(node);
 					node.setName(nodeShape.getText());
 				}

@@ -23,6 +23,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ynn.network.model.Attribute;
+import ynn.network.model.DefaultNodeFactory;
+import ynn.network.model.INodeFactory;
 import ynn.network.model.Node;
 import ynn.network.ui.AbstractShape;
 import ynn.network.ui.ConnectorShape;
@@ -36,6 +38,7 @@ public class NetworkSerializer
 	private Map<AbstractShape,Integer> _shapesToSerialize;
 	private Map<Integer,AbstractShape> _shapesToDeserialize;
 	private int _shapeId;
+	private INodeFactory _nodeFactory = null;
 	
 	public NetworkSerializer(NetworkView view)
 	{
@@ -43,6 +46,17 @@ public class NetworkSerializer
 		_shapesToSerialize = new HashMap<AbstractShape, Integer>();
 		_shapesToDeserialize = new HashMap<Integer, AbstractShape>();
 		_shapeId = 0;
+	}
+	
+	public void setNodeFactory(INodeFactory factory)
+	{
+		_nodeFactory = factory;
+	}
+	
+	public INodeFactory getNodeFactory()
+	{
+		if (_nodeFactory == null) _nodeFactory = new DefaultNodeFactory();
+		return _nodeFactory; 
 	}
 	
 	public void serialize(File file) throws IOException
@@ -202,7 +216,7 @@ public class NetworkSerializer
 
 	private void deserializeNodeData(org.w3c.dom.Node eNode, NodeShape shape)
 	{
-		Node node = new Node();
+		Node node = getNodeFactory().createNode();
 		for (int i = 0; i < eNode.getChildNodes().getLength(); i++)
 		{
 			org.w3c.dom.Node item = eNode.getChildNodes().item(i);

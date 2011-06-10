@@ -8,16 +8,21 @@ public class EWD426Utils implements AlgorithmUtils
 {
 
 	@Override
-	public void initNodeAttributes(Node node)
+	public NetworkAlgorithm createAlgorithm()
 	{
-		// TODO
+		return new EWD426Algorithm();
 	}
 
 	@Override
-	public NetworkAlgorithm createAlgorithm()
+	public Node createNode()
 	{
-		return null;
-		// TODO
+		return new EWD426Node();
+	}
+
+	@Override
+	public void initNodeAttributes(Node node)
+	{
+		((EWD426Node)node).init();
 	}
 
 }

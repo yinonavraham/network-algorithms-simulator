@@ -14,7 +14,7 @@ public class SetAsRootCommand implements Command
 	{
 		_node = node;
 		_command = new CompositeCommand();
-		Aky90Node akyNode = new Aky90Node(node);
+		Aky90Node akyNode = (Aky90Node)node;
 		Aky90NodeAttributes attr = new Aky90NodeAttributes();
 		_command.add(new SetNodeAttributeCommand(node, attr.getByName(Aky90NodeAttributes.ROOT), akyNode.getId()));
 		_command.add(new SetParentCommand(node, akyNode.getId()));

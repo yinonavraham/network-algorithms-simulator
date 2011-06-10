@@ -115,6 +115,16 @@ public class Icons
 		return getIcon("Console.png");
 	}
 	
+	public static Icon getStep()
+	{
+		return getIcon("Step16.png");
+	}
+	
+	public static Icon getUndo()
+	{
+		return getIcon("hot/Undo.png");
+	}
+	
 	public static Image getNetwork()
 	{
 		return new ImageIcon(getResource("network.png")).getImage();
