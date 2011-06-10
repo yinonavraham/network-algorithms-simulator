@@ -53,6 +53,7 @@ import ynn.network.ui.SelectionChangedEvent;
 import ynn.network.util.NetworkSerializer;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.AlgorithmExecuter;
+import ynn.tech.algorithms.network.CommandStack;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
 import ynn.tech.algorithms.network.ui.attributes.AttributesView;
@@ -112,6 +113,7 @@ public class MainWindow extends JFrame
     private NetworkModel _networkModel;
     private NetworkAdapter _networkAdapter;
     private AlgorithmExecuter _algExececuter = null;
+    private CommandStack _commands;
     
     private int _nodeId = 1;
 	private File _currentFile = null;
@@ -129,6 +131,7 @@ public class MainWindow extends JFrame
         setLocationRelativeTo(null);
         setIconImage(Icons.getNetwork());
 		initializeControls();
+		_commands = new CommandStack();
 	}
 	
 	// #######################################################################
@@ -174,6 +177,14 @@ public class MainWindow extends JFrame
 		_tabbedPane.addTab("Console", Icons.getConsole(), new JScrollPane(_console));
 		// Attributes Tab
 		_attributesView = new AttributesView();
+		_attributesView.addErrorListener(new ErrorOccurredListener()
+		{
+			@Override
+			public void errorOccurred(Object source, Throwable ex, String message)
+			{
+				handleErrorOccured(source,ex,message);
+			}
+		});
 		_tabbedPane.addTab("Attributes", Icons.getClipboard(), _attributesView);
 	}
 
@@ -410,7 +421,7 @@ public class MainWindow extends JFrame
 		
 		_toolBarPlayTime = new JLabel();
 		_toolBarPlayTime.setBorder(BorderFactory.createEtchedBorder());
-		updateTime();
+		updateSimulationTime();
 		_toolBarPlay.add(_toolBarPlayTime);
 		
 		_toolBarsPanel.add(_toolBarPlay);
@@ -689,18 +700,62 @@ public class MainWindow extends JFrame
 		_toolBarFileSave.setEnabled(enabled);
 	}
 
-	private void updateTime()
+	private void updateSimulationTime()
 	{
-		int time = _algExececuter == null ? 0 : _algExececuter.getTime();
+		int time = getSimulationTime();
 		_toolBarPlayTime.setText(String.format("t = %d", time));
 	}
 	
-	private void updateConsole(String[] strings)
+	private int getSimulationTime()
 	{
-		_console.setText("");
+		return _algExececuter == null ? 0 : _algExececuter.getTime();
+	}
+	
+	private void writeToConsole(String[] strings)
+	{
 		if (strings != null)
 			for (String s : strings) _console.append(s + "\n");
-		_console.setCaretPosition(0);
+		else _console.setText("");
+	}
+	
+	private void writeToConsole(String message)
+	{
+		writeToConsole(new String[] { message });
+	}
+	
+	private void writeToConsole(Throwable e)
+	{
+		String prefix = "Error occurred: ";
+		while (e != null)
+		{
+			writeToConsole(prefix + e.toString());
+			prefix = "Caused by: ";
+			e = e.getCause();
+		}
+	}
+	
+	private void clearConsole()
+	{
+		writeToConsole((String[])null);
+	}
+
+	protected void handleErrorOccured(Object source, Throwable ex, String message)
+	{
+		writeToConsole(message);
+		writeToConsole(ex);
+		StringBuilder sb = new StringBuilder();
+		sb.append(message);
+		if (ex != null)
+		{
+			while (ex != null)
+			{
+				sb.append("\nCaused by: ");
+				sb.append(ex);
+				ex = ex.getCause();
+			}
+		}
+		JOptionPane.showMessageDialog(
+			this, sb.toString(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	// #######################################################################
@@ -716,11 +771,12 @@ public class MainWindow extends JFrame
 			_nodeId = 1;
 			_algDescriptor = descriptor;
 			initializeNetworkView();
-			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel);
-			updateTime();
+			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
+			updateSimulationTime();
 			validate();
 			enableEdit(true);
 			enableSave(true);
+			clearConsole();
 		}
 	}
 
@@ -746,11 +802,13 @@ public class MainWindow extends JFrame
 				enablePlay(false);
 				enableSave(true);
 				validate();
+				clearConsole();
 			}
 		}
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
+			writeToConsole(ex);
 			JOptionPane.showMessageDialog(this, 
 				String.format(
 					"Error occured while trying to load from file \"%s\":\n%s",
@@ -795,6 +853,7 @@ public class MainWindow extends JFrame
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
+			writeToConsole(ex);
 			JOptionPane.showMessageDialog(this, 
 				String.format(
 					"Error occured while trying to save to file \"%s\":\n%s",
@@ -920,8 +979,9 @@ public class MainWindow extends JFrame
 		if (_algExececuter != null)
 		{
 			String[] strings = _algExececuter.stepForward();
-			updateTime();
-			updateConsole(strings);
+			updateSimulationTime();
+			writeToConsole("Step at t = " + getSimulationTime());
+			writeToConsole(strings);
 		}
 	}
 
@@ -930,8 +990,8 @@ public class MainWindow extends JFrame
 		if (_algExececuter != null)
 		{
 			_algExececuter.stepBack();
-			updateTime();
-			updateConsole(null);
+			writeToConsole("Undo step, back to t = " + getSimulationTime());
+			updateSimulationTime();
 		}
 	}
 	

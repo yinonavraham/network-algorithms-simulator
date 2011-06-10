@@ -13,6 +13,12 @@ public class CommandStack
 		_commands = new ArrayList<Command>();
 	}
 	
+	public void reset()
+	{
+		_commands.clear();
+		_currentCmd = -1;
+	}
+	
 	public void executeCommand(Command cmd)
 	{
 		cmd.execute();
