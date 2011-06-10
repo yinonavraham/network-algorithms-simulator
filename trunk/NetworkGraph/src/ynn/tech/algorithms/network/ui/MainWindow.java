@@ -81,8 +81,6 @@ public class MainWindow extends JFrame
 	private JMenuItem _editMenuInsertNode;
 	private JMenuItem _editMenuDelete;
 	private JMenu _playMenu;
-//	private JMenuItem _playMenuStart;
-//	private JMenuItem _playMenuStop;
 	private JMenuItem _playMenuNext;
 	private JMenuItem _playMenuPrev;
 	private JMenu _helpMenu;
@@ -101,8 +99,6 @@ public class MainWindow extends JFrame
 	private ComboBoxLabelItemModel _toolBarEditModeTypeMove;
 	private ComboBoxLabelItemModel _toolBarEditModeTypeConnect;
 	private JToolBar _toolBarPlay;
-//	private JButton _toolBarPlayStart;
-//	private JButton _toolBarPlayStop;
 	private JButton _toolBarPlayNext;
 	private JButton _toolBarPlayPrev;
 	private JLabel _toolBarPlayTime;
@@ -131,7 +127,7 @@ public class MainWindow extends JFrame
 	{
 		super("Network Algorithms Simulator");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(600, 450);
+		setSize(800, 600);
         setLocationRelativeTo(null);
         setIconImage(Icons.getNetwork());
 		initializeControls();
@@ -164,7 +160,6 @@ public class MainWindow extends JFrame
 		});
 		initializeMenu();
 		initializeToolBar();
-		//initializeNetworkView();
 		enableEdit(false);
 		enablePlay(false);
 		enableSave(false);
@@ -176,11 +171,8 @@ public class MainWindow extends JFrame
 		// Console Tab
 		_console = new JTextPane();
 		_console.setText("");
-//		_console.setRows(5);
 		_console.setBorder(BorderFactory.createLoweredBevelBorder());
 		_console.setEditable(false);
-//		_console.setWrapStyleWord(true);
-//		_console.setLineWrap(true);
 		_console.setAutoscrolls(true);
 		_console.setFont((new JList()).getFont());
 		_tabbedPane.addTab("Console", Icons.getConsole(), new JScrollPane(_console));
@@ -698,8 +690,6 @@ public class MainWindow extends JFrame
 		_playMenu.setEnabled(enabled);
 		_toolBarPlayNext.setEnabled(enabled);
 		_toolBarPlayPrev.setEnabled(enabled);
-//		_toolBarPlayStart.setEnabled(enabled);
-//		_toolBarPlayStop.setEnabled(enabled);
 	}
 	
 	private void enableSave(boolean enabled)
@@ -730,7 +720,6 @@ public class MainWindow extends JFrame
 		if (strings != null)
 			for (String s : strings) 
 			{
-//				_console.append(s + "\n");
 				_console.setCaretPosition(_console.getDocument().getLength());
 			    _console.setEditable(true);
 				_console.replaceSelection(s + "\n");
@@ -792,6 +781,13 @@ public class MainWindow extends JFrame
 	// #######################################################################
 	// ##########                 on event methods                  ##########
 	// #######################################################################
+	
+	private void setEditMode()
+	{
+		enableEdit(true);
+		enableSave(true);
+		enablePlay(false);
+	}
 
 	private void onNew()
 	{
@@ -805,8 +801,9 @@ public class MainWindow extends JFrame
 			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 			updateSimulationTime();
 			validate();
-			enableEdit(true);
-			enableSave(true);
+			setEditMode();
+			onAllowEditChanged(true);
+			onEditModeSelected(Mode.Move);
 			clearConsole();
 		}
 	}
@@ -829,9 +826,9 @@ public class MainWindow extends JFrame
 				NetworkSerializer serializer = new NetworkSerializer(_networkView);
 				serializer.deserialize(file);
 				_currentFile = file;
-				enableEdit(true);
-				enablePlay(false);
-				enableSave(true);
+				setEditMode();
+				onAllowEditChanged(true);
+				onEditModeSelected(Mode.Move);
 				validate();
 				clearConsole();
 			}
@@ -957,54 +954,6 @@ public class MainWindow extends JFrame
 	{
 		_networkView.removeSelectedShape();
 	}
-	
-//	private void onStartSimulation()
-//	{
-//		// Simulation tool bar
-//		_toolBarPlayNext.setEnabled(false);
-//		_toolBarPlayPrev.setEnabled(false);
-////		_toolBarPlayStart.setEnabled(false);
-////		_toolBarPlayStop.setEnabled(true);
-////		_toolBarPlayStop.requestFocus();
-//		// Simulation menu
-//		_playMenuNext.setEnabled(false);
-//		_playMenuPrev.setEnabled(false);
-////		_playMenuStart.setEnabled(false);
-////		_playMenuStop.setEnabled(true);
-//		// Edit
-//		_toolBarEditMode.setEnabled(false);
-//		_editMenu.setEnabled(false);
-//		// File
-//		_toolBarFileNew.setEnabled(false);
-//		_toolBarFileOpen.setEnabled(false);
-//		_toolBarFileSave.setEnabled(false);
-//		_fileMenu.setEnabled(false);
-//		// TODO
-//	}
-//	
-//	private void onStopSimulation()
-//	{
-//		// Simulation tool bar
-//		_toolBarPlayNext.setEnabled(true);
-//		_toolBarPlayPrev.setEnabled(true);
-////		_toolBarPlayStart.setEnabled(true);
-////		_toolBarPlayStop.setEnabled(false);
-////		_toolBarPlayStart.requestFocus();
-//		// Simulation menu
-//		_playMenuNext.setEnabled(true);
-//		_playMenuPrev.setEnabled(true);
-////		_playMenuStart.setEnabled(true);
-////		_playMenuStop.setEnabled(false);
-//		// Edit
-//		_toolBarEditMode.setEnabled(true);
-//		_editMenu.setEnabled(true);
-//		// File
-//		_toolBarFileNew.setEnabled(true);
-//		_toolBarFileOpen.setEnabled(true);
-//		_toolBarFileSave.setEnabled(true);
-//		_fileMenu.setEnabled(true);
-//		// TODO
-//	}
 	
 	private void onSimulationNextStep()
 	{
