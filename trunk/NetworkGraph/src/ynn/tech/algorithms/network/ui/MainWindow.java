@@ -33,11 +33,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import ynn.network.adapter.NetworkAdapter;
 import ynn.network.model.NetworkModel;
@@ -105,7 +109,7 @@ public class MainWindow extends JFrame
 
 	private JPanel _contentPanel;
 	private JSplitPane _splitter;
-	private JTextArea _console;
+	private JTextPane _console;
 	private AttributesView _attributesView;
 	private JTabbedPane _tabbedPane;
 	
@@ -132,6 +136,10 @@ public class MainWindow extends JFrame
         setIconImage(Icons.getNetwork());
 		initializeControls();
 		_commands = new CommandStack();
+		writeToConsole(
+			"Welcome!\n" +
+			"In order to start, please create a new network " +
+			"or open an existing one from the file system.");
 	}
 	
 	// #######################################################################
@@ -166,12 +174,13 @@ public class MainWindow extends JFrame
 	{
 		_tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		// Console Tab
-		_console = new JTextArea();
-		_console.setRows(5);
+		_console = new JTextPane();
+		_console.setText("");
+//		_console.setRows(5);
 		_console.setBorder(BorderFactory.createLoweredBevelBorder());
 		_console.setEditable(false);
-		_console.setWrapStyleWord(true);
-		_console.setLineWrap(true);
+//		_console.setWrapStyleWord(true);
+//		_console.setLineWrap(true);
 		_console.setAutoscrolls(true);
 		_console.setFont((new JList()).getFont());
 		_tabbedPane.addTab("Console", Icons.getConsole(), new JScrollPane(_console));
@@ -711,11 +720,28 @@ public class MainWindow extends JFrame
 		return _algExececuter == null ? 0 : _algExececuter.getTime();
 	}
 	
+	private void writeToConsole(String[] strings, boolean isError)
+	{
+		Color c = isError ? Color.RED : Color.BLACK;
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
+	        StyleConstants.Foreground, c);
+	    _console.setCharacterAttributes(aset, false);
+		if (strings != null)
+			for (String s : strings) 
+			{
+//				_console.append(s + "\n");
+				_console.setCaretPosition(_console.getDocument().getLength());
+			    _console.setEditable(true);
+				_console.replaceSelection(s + "\n");
+			    _console.setEditable(false);
+			}
+		else _console.setText("");
+	}
+	
 	private void writeToConsole(String[] strings)
 	{
-		if (strings != null)
-			for (String s : strings) _console.append(s + "\n");
-		else _console.setText("");
+		writeToConsole(strings,false);
 	}
 	
 	private void writeToConsole(String message)
@@ -723,12 +749,17 @@ public class MainWindow extends JFrame
 		writeToConsole(new String[] { message });
 	}
 	
+	private void writeToConsole(String message, boolean isError)
+	{
+		writeToConsole(new String[] { message }, isError);
+	}
+	
 	private void writeToConsole(Throwable e)
 	{
 		String prefix = "Error occurred: ";
 		while (e != null)
 		{
-			writeToConsole(prefix + e.toString());
+			writeToConsole(prefix + e.toString(),true);
 			prefix = "Caused by: ";
 			e = e.getCause();
 		}
@@ -741,7 +772,7 @@ public class MainWindow extends JFrame
 
 	protected void handleErrorOccured(Object source, Throwable ex, String message)
 	{
-		writeToConsole(message);
+		writeToConsole(message,true);
 		writeToConsole(ex);
 		StringBuilder sb = new StringBuilder();
 		sb.append(message);
