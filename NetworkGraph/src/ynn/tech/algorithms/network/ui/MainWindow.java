@@ -11,7 +11,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -54,7 +53,9 @@ import ynn.network.ui.NetworkView.Mode;
 import ynn.network.ui.NodeShape;
 import ynn.network.ui.NodesEvent;
 import ynn.network.ui.SelectionChangedEvent;
+import ynn.network.util.DeserializationException;
 import ynn.network.util.NetworkSerializer;
+import ynn.network.util.SerializationException;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.AlgorithmExecuter;
 import ynn.tech.algorithms.network.CommandStack;
@@ -808,6 +809,7 @@ public class MainWindow extends JFrame
 			_nodeId = 1;
 			_algDescriptor = descriptor;
 			initializeNetworkView();
+			_commands.clear();
 			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 			updateSimulationTime();
 			validate();
@@ -835,6 +837,9 @@ public class MainWindow extends JFrame
 				validate();
 				NetworkSerializer serializer = new NetworkSerializer(_networkView);
 				serializer.deserialize(file);
+				_algDescriptor = serializer.getAlgorithmDescriptor();
+				_commands.clear();
+				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 				_currentFile = file;
 				setEditMode();
 				onAllowEditChanged(true);
@@ -843,7 +848,7 @@ public class MainWindow extends JFrame
 				clearConsole();
 			}
 		}
-		catch (IOException ex)
+		catch (DeserializationException ex)
 		{
 			ex.printStackTrace();
 			writeToConsole(ex);
@@ -884,11 +889,12 @@ public class MainWindow extends JFrame
 			if (file != null)
 			{
 				NetworkSerializer serializer = new NetworkSerializer(_networkView);
+				serializer.setAlgorithmDescriptor(_algDescriptor);
 				serializer.serialize(file);
 				_currentFile = file;
 			}
 		}
-		catch (IOException ex)
+		catch (SerializationException ex)
 		{
 			ex.printStackTrace();
 			writeToConsole(ex);

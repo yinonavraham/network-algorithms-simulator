@@ -2,7 +2,6 @@ package ynn.network.util;
 
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import ynn.network.ui.ConnectorShape;
 import ynn.network.ui.ConnectorShape.Direction;
 import ynn.network.ui.NetworkView;
 import ynn.network.ui.NodeShape;
+import ynn.tech.algorithms.network.AlgorithmDescriptor;
 
 public class NetworkSerializer
 {
@@ -39,6 +39,7 @@ public class NetworkSerializer
 	private Map<Integer,AbstractShape> _shapesToDeserialize;
 	private int _shapeId;
 	private INodeFactory _nodeFactory = null;
+	private AlgorithmDescriptor _algDescriptor; 
 	
 	public NetworkSerializer(NetworkView view)
 	{
@@ -46,6 +47,17 @@ public class NetworkSerializer
 		_shapesToSerialize = new HashMap<AbstractShape, Integer>();
 		_shapesToDeserialize = new HashMap<Integer, AbstractShape>();
 		_shapeId = 0;
+		_algDescriptor = null;
+	}
+	
+	public void setAlgorithmDescriptor(AlgorithmDescriptor descriptor)
+	{
+		_algDescriptor = descriptor;
+	}
+	
+	public AlgorithmDescriptor getAlgorithmDescriptor()
+	{
+		return _algDescriptor;
 	}
 	
 	public void setNodeFactory(INodeFactory factory)
@@ -59,7 +71,7 @@ public class NetworkSerializer
 		return _nodeFactory; 
 	}
 	
-	public void serialize(File file) throws IOException
+	public void serialize(File file) throws SerializationException
 	{
 		try
 		{
@@ -69,6 +81,7 @@ public class NetworkSerializer
 			Element eNetwork = doc.createElement("Network");
 			_shapeId = 0;
 			_shapesToSerialize.clear();
+			serializeNetworkAttributes(doc, eNetwork);
 			serializeNodeShapes(doc, eNetwork);
 			serializeConnectorShapes(doc, eNetwork);
 			doc.appendChild(eNetwork);
@@ -76,8 +89,16 @@ public class NetworkSerializer
 		}
 		catch (ParserConfigurationException e)
 		{
-			throw new IOException(e);
+			throw new SerializationException(
+				"Failed to serialize the network to the given file: " + file,e);
 		}
+	}
+
+	private void serializeNetworkAttributes(Document doc, Element eNetwork)
+	{
+		Attr attr = doc.createAttribute("algorithm");
+		attr.setNodeValue(_algDescriptor.getClass().getName());
+		eNetwork.setAttributeNode(attr);
 	}
 
 	private void serializeNodeShapes(Document doc, Element eNetwork)
@@ -133,7 +154,7 @@ public class NetworkSerializer
 	    }
 	}
 	
-	public void deserialize(File file) throws IOException
+	public void deserialize(File file) throws DeserializationException
 	{
 		try
 		{
@@ -142,6 +163,7 @@ public class NetworkSerializer
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(file);
 			org.w3c.dom.Node eNetwork = doc.getElementsByTagName("Network").item(0);
+			deserializeNetworkAttributes(eNetwork);
 			String[] networkParts = { "Nodes", "Connectors" };
 			for (String part : networkParts)
 			{
@@ -157,7 +179,24 @@ public class NetworkSerializer
 		}
 		catch (Exception e)
 		{
-			throw new IOException(e);
+			throw new DeserializationException("Failed to deserialize the given file: " + file,e);
+		}
+	}
+
+	private void deserializeNetworkAttributes(org.w3c.dom.Node eNetwork) throws DeserializationException
+	{
+		try
+		{
+			org.w3c.dom.Node node = eNetwork.getAttributes().getNamedItem("algorithm");
+			String className = node.getNodeValue();
+			Class<?> algClass = Class.forName(className);
+			_algDescriptor = (AlgorithmDescriptor)algClass.newInstance();
+			setNodeFactory(_algDescriptor.getUtilities());
+		}
+		catch (Throwable e)
+		{
+			throw new DeserializationException(
+				"Failed to deserialize the algorithm that the network is based on: ",e);
 		}
 	}
 	

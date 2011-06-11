@@ -13,7 +13,7 @@ public class CommandStack
 		_commands = new ArrayList<Command>();
 	}
 	
-	public void reset()
+	public void clear()
 	{
 		_commands.clear();
 		_currentCmd = -1;
