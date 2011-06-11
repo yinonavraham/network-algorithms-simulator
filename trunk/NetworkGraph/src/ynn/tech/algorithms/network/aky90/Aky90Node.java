@@ -1,13 +1,31 @@
 package ynn.tech.algorithms.network.aky90;
 
 import ynn.network.model.Direction;
+import ynn.network.model.INodeListener;
 import ynn.network.model.Node;
+import ynn.network.model.NodeAttributeEvent;
+import ynn.network.model.NodeNeighborEvent;
 
 public class Aky90Node extends Node
 {	
 	public Aky90Node()
 	{
 		super();
+		addListener(new INodeListener()
+		{	
+			@Override
+			public void nodeNeighborsChanged(NodeNeighborEvent e) {}
+			@Override
+			public void nodeAttributeChanged(NodeAttributeEvent e)
+			{
+				if (Aky90NodeAttributes.PARENT.equals(e.getAttribute().getName()))
+				{
+					Aky90Node oldParent = (Aky90Node)getParentById((String)e.getOldValue());
+					Aky90Node newParent = (Aky90Node)getParentById((String)e.getNewValue());
+					updateParentDirection(oldParent,newParent);
+				}
+			}
+		});
 	}
 	
 	public void init()
@@ -27,33 +45,37 @@ public class Aky90Node extends Node
 		setParent(akyParent.getId());
 	}
 	
-	public void setParent(String parentId)
+	private void updateParentDirection(Aky90Node oldParent, Aky90Node newParent)
 	{
-		Direction parentDir = getNeighborDirection(getParent());
+		Direction parentDir = getNeighborDirection(oldParent);
 		if (parentDir != null)
 		{
 			if (parentDir.equals(Direction.Default))
 			{
-				setNeighborDirection(getParent(), Direction.None);
+				setNeighborDirection(oldParent, Direction.None);
 			}
 			else if (parentDir.equals(Direction.Both))
 			{
-				setNeighborDirection(getParent(), Direction.Other);
+				setNeighborDirection(oldParent, Direction.Other);
 			}
 		}
-		putAttribute(Aky90NodeAttributes.PARENT, parentId);
-		parentDir = getNeighborDirection(getParent());
+		parentDir = getNeighborDirection(newParent);
 		if (parentDir != null)
 		{
 			if (parentDir.equals(Direction.None))
 			{
-				setNeighborDirection(getParent(), Direction.Default);
+				setNeighborDirection(newParent, Direction.Default);
 			}
 			else if (parentDir.equals(Direction.Other))
 			{
-				setNeighborDirection(getParent(), Direction.Both);
+				setNeighborDirection(newParent, Direction.Both);
 			}
 		}
+	}
+	
+	public void setParent(String parentId)
+	{
+		putAttribute(Aky90NodeAttributes.PARENT, parentId);
 	}
 	
 	public String getParentId()
@@ -68,8 +90,13 @@ public class Aky90Node extends Node
 	
 	public Node getParent()
 	{
-		if (this.getId().equals(this.getParentId())) return this;
-		else return getFirstNeighborByName(getParentId());
+		return getParentById(getParentId());
+	}
+	
+	private Node getParentById(String id)
+	{
+		if (this.getId().equals(id)) return this;
+		else return getFirstNeighborByName(id);	
 	}
 	
 	public Node getRoot()

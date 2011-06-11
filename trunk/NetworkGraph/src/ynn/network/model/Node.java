@@ -181,8 +181,12 @@ public class Node
 		if (_attributes.containsKey(attribute))
 		{
 			Object oldValue = _attributes.get(attribute);
-			_attributes.put(attribute, value);
-			fireAttributeChanged(attribute, oldValue, value);
+			if (value != null && !value.equals(oldValue) ||
+				oldValue != null && !oldValue.equals(value))
+			{
+				_attributes.put(attribute, value);
+				fireAttributeChanged(attribute, oldValue, value);
+			}
 		}
 		else
 		{

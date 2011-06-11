@@ -254,6 +254,7 @@ public class NetworkAdapter
 		case NodeAttributeEvent.REMOVED:
 			break;
 		case NodeAttributeEvent.CHANGED:
+			_view.repaint();
 			break;
 		}	
 	}
