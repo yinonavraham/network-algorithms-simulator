@@ -713,6 +713,11 @@ public class MainWindow extends JFrame
 	private void writeToConsole(String[] strings, boolean isError)
 	{
 		Color c = isError ? Color.RED : Color.BLACK;
+		writeToConsole(strings, c);
+	}
+	
+	private void writeToConsole(String[] strings, Color c)
+	{
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
 	        StyleConstants.Foreground, c);
@@ -741,6 +746,11 @@ public class MainWindow extends JFrame
 	private void writeToConsole(String message, boolean isError)
 	{
 		writeToConsole(new String[] { message }, isError);
+	}
+	
+	private void writeToConsole(String message, Color c)
+	{
+		writeToConsole(new String[] { message }, c);
 	}
 	
 	private void writeToConsole(Throwable e)
@@ -961,7 +971,7 @@ public class MainWindow extends JFrame
 		{
 			String[] strings = _algExececuter.stepForward();
 			updateSimulationTime();
-			writeToConsole("Step at t = " + getSimulationTime());
+			writeToConsole("Step at t = " + getSimulationTime(),Color.BLUE);
 			writeToConsole(strings);
 			_networkView.repaint();
 		}
@@ -972,7 +982,7 @@ public class MainWindow extends JFrame
 		if (_algExececuter != null)
 		{
 			_algExececuter.stepBack();
-			writeToConsole("Undo step, back to t = " + getSimulationTime());
+			writeToConsole("Undo step, back to t = " + getSimulationTime(),Color.BLUE);
 			updateSimulationTime();
 			_networkView.repaint();
 		}
