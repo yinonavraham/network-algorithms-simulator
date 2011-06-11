@@ -88,6 +88,21 @@ public class ConnectorShape extends AbstractShape implements IShapeListener
 	}
 
 	@Override
+	protected void drawAnnotationFill(Graphics2D g)
+	{
+	}
+
+	@Override
+	protected void drawAnnotationLine(Graphics2D g)
+	{
+	}
+
+	@Override
+	protected void drawAnnotationText(Graphics2D g)
+	{
+	}
+
+	@Override
 	protected void drawShapeFill(Graphics2D g)
 	{
 	}

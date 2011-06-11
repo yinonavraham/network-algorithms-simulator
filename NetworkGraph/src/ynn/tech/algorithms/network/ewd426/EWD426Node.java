@@ -5,8 +5,9 @@ import ynn.network.model.INodeListener;
 import ynn.network.model.Node;
 import ynn.network.model.NodeAttributeEvent;
 import ynn.network.model.NodeNeighborEvent;
+import ynn.network.ui.IAnnotationProvider;
 
-public class EWD426Node extends Node
+public class EWD426Node extends Node implements IAnnotationProvider
 {
 	private EWD426NodeAttributes _attributes = new EWD426NodeAttributes();
 	
@@ -161,5 +162,15 @@ public class EWD426Node extends Node
 			}
 			else setHasToken(false);
 		}
+	}
+
+	@Override
+	public String getAnnotationText()
+	{
+		Integer value = getTokenValue();
+		Boolean hasToken = getHasToken();
+		return value != null ? String.valueOf(value) +
+			(hasToken ? "T" : "")
+			: null;
 	}
 }
