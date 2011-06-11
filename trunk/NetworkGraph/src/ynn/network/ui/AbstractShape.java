@@ -9,7 +9,7 @@ import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractShape
+public abstract class AbstractShape implements IAnnotationProvider
 {
 	private boolean _isSelected = false;
 	private String _text = "";
@@ -18,8 +18,12 @@ public abstract class AbstractShape
 	private Color _selectedColor = Color.YELLOW;
 	private Color _lineColor = Color.BLACK;
 	private Color _textColor = Color.BLACK;
+	private Color _annLineColor = Color.BLACK;//getHSBColor(38, 240, 209);
+	private Color _annFillColor = Color.YELLOW;//getHSBColor(26, 240, 209);
+	private Color _annTextColor = Color.BLACK;//Color.getHSBColor(12, 107, 102);
 	private float _lineWidth = 1.0f;
 	private Font _font = Font.decode("Arial").deriveFont(Font.BOLD, 20.0f);
+	private Font _annFont = Font.decode("Arial").deriveFont(Font.PLAIN, 14.0f);
 	private List<IShapeListener> _shapeListeners = new LinkedList<IShapeListener>();
 	private Object _data = null;
 	
@@ -67,6 +71,12 @@ public abstract class AbstractShape
 
 	protected abstract void drawShapeLine(Graphics2D g);
 
+	protected abstract void drawAnnotationLine(Graphics2D g);
+
+	protected abstract void drawAnnotationFill(Graphics2D g);
+
+	protected abstract void drawAnnotationText(Graphics2D g);
+
 	protected void drawShapeText(Graphics2D g)
 	{
 	}
@@ -93,6 +103,17 @@ public abstract class AbstractShape
 		g.setColor(_textColor);
 		g.setFont(getFont());
 		drawShapeText(g);
+		if (getAnnotationText() != null && !getAnnotationText().isEmpty())
+		{
+			g.setColor(_annFillColor);
+			drawAnnotationFill(g);
+			g.setColor(_annTextColor);
+			g.setFont(getAnnotationFont());
+			drawAnnotationText(g);
+			g.setColor(_annLineColor);
+			g.setStroke(new BasicStroke(getLineWidth()));
+			drawAnnotationLine(g);
+		}
 	}
 	
 	public void draw(Graphics2D g)
@@ -192,6 +213,36 @@ public abstract class AbstractShape
 		return _textColor;
 	}
 
+	public void setAnnotationTextColor(Color color)
+	{
+		_annTextColor = color;
+	}
+
+	public Color getAnnotationTextColor()
+	{
+		return _annTextColor;
+	}
+
+	public void setAnnotationFillColor(Color color)
+	{
+		_annFillColor = color;
+	}
+
+	public Color getAnnotationFillColor()
+	{
+		return _annFillColor;
+	}
+
+	public void setAnnotationLineColor(Color color)
+	{
+		_annLineColor = color;
+	}
+
+	public Color getAnnotationLineColor()
+	{
+		return _annLineColor;
+	}
+
 	public void setLineWidth(float width)
 	{
 		_lineWidth = width;
@@ -211,6 +262,16 @@ public abstract class AbstractShape
 	{
 		return _font;
 	}
+
+	public void setAnnotationFont(Font font)
+	{
+		_annFont = font;
+	}
+
+	public Font getAnnotationFont()
+	{
+		return _annFont;
+	}
 	
 	public void setData(Object data)
 	{
@@ -223,4 +284,10 @@ public abstract class AbstractShape
 	}
 	
 	public abstract Dimension getDimension();
+	
+	public String getAnnotationText()
+	{
+		return getData() != null && getData() instanceof IAnnotationProvider ?
+			((IAnnotationProvider)getData()).getAnnotationText() : null;
+	}
 }

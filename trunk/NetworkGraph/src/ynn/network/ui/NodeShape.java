@@ -6,10 +6,12 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 public class NodeShape extends AbstractShape
 {
 	Ellipse2D.Double _ellipse;
+	Rectangle2D.Double _rect;
 
 	public NodeShape()
 	{
@@ -19,6 +21,49 @@ public class NodeShape extends AbstractShape
 		_ellipse.y = 0;
 		_ellipse.width = 50;
 		_ellipse.height = 50;
+		_rect = new Rectangle2D.Double();
+		_rect.width = 20;
+		_rect.height = 20;
+		updateAnnotationPosition();
+	}
+	
+	private void updateAnnotationPosition()
+	{
+		_rect.x = _ellipse.x + _ellipse.width - 10;
+		_rect.y = _ellipse.y + (10 - _rect.height);
+	}
+
+	@Override
+	protected void drawAnnotationLine(Graphics2D g)
+	{
+		updateAnnotationRectSize(g);
+		g.draw(_rect);
+	}
+
+	@Override
+	protected void drawAnnotationFill(Graphics2D g)
+	{
+		updateAnnotationRectSize(g);
+		g.fill(_rect);
+	}
+
+	@Override
+	protected void drawAnnotationText(Graphics2D g)
+	{
+		updateAnnotationRectSize(g);
+		String text = getAnnotationText();
+		FontMetrics fontMetrics = g.getFontMetrics(getAnnotationFont());
+        float textX = (float) (_rect.x + (_rect.width - fontMetrics.stringWidth(text)) / 2);
+        float textY = (float) (_rect.y + (_rect.height + fontMetrics.getHeight() / 2) / 2);
+        g.drawString(text, textX, textY);
+	}
+	
+	private void updateAnnotationRectSize(Graphics2D g)
+	{
+		String text = getAnnotationText();
+		FontMetrics fontMetrics = g.getFontMetrics(getAnnotationFont());
+        _rect.width = fontMetrics.stringWidth(text) + 4;
+        _rect.height = fontMetrics.getHeight() + 4;
 	}
 
 	@Override
@@ -54,6 +99,7 @@ public class NodeShape extends AbstractShape
 	{
 		_ellipse.x += dx;
 		_ellipse.y += dy;
+		updateAnnotationPosition();
 	}
 
 	@Override
@@ -73,6 +119,7 @@ public class NodeShape extends AbstractShape
 		Point2D old = getPosition();
 		_ellipse.x = pos.getX();
 		_ellipse.y = pos.getY();
+		updateAnnotationPosition();
 		fireShapeMoved(old, pos);
 	}
 	
