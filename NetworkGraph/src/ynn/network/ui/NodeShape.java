@@ -62,8 +62,8 @@ public class NodeShape extends AbstractShape
 	{
 		String text = getAnnotationText();
 		FontMetrics fontMetrics = g.getFontMetrics(getAnnotationFont());
-        _rect.width = fontMetrics.stringWidth(text) + 4;
         _rect.height = fontMetrics.getHeight() + 4;
+        _rect.width = Math.max(fontMetrics.stringWidth(text) + 4,_rect.height);
 	}
 
 	@Override
