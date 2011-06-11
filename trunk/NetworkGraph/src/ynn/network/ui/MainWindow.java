@@ -3,7 +3,6 @@ package ynn.network.ui;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
@@ -14,7 +13,9 @@ import ynn.network.model.NetworkModel;
 import ynn.network.model.Node;
 import ynn.network.ui.ConnectorShape.Direction;
 import ynn.network.ui.NetworkView.Mode;
+import ynn.network.util.DeserializationException;
 import ynn.network.util.NetworkSerializer;
+import ynn.network.util.SerializationException;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 
@@ -77,7 +78,7 @@ public class MainWindow extends JFrame
 						NetworkSerializer serializer = new NetworkSerializer(_networkView);
 						serializer.serialize(file);
 					}
-					catch (IOException ex)
+					catch (SerializationException ex)
 					{
 						ex.printStackTrace();
 					}
@@ -90,7 +91,7 @@ public class MainWindow extends JFrame
 						serializer.deserialize(file);
 						_networkView.repaint();
 					}
-					catch (IOException ex)
+					catch (DeserializationException ex)
 					{
 						ex.printStackTrace();
 					}
