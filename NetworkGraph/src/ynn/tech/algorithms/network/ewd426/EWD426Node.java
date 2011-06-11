@@ -1,6 +1,10 @@
 package ynn.tech.algorithms.network.ewd426;
 
+import ynn.network.model.Direction;
+import ynn.network.model.INodeListener;
 import ynn.network.model.Node;
+import ynn.network.model.NodeAttributeEvent;
+import ynn.network.model.NodeNeighborEvent;
 
 public class EWD426Node extends Node
 {
@@ -9,6 +13,21 @@ public class EWD426Node extends Node
 	public EWD426Node()
 	{
 		super();
+		addListener(new INodeListener()
+		{	
+			@Override
+			public void nodeNeighborsChanged(NodeNeighborEvent e) {}
+			@Override
+			public void nodeAttributeChanged(NodeAttributeEvent e)
+			{
+				if (EWD426NodeAttributes.PREV_NODE.equals(e.getAttribute().getName()))
+				{
+					EWD426Node oldPrevNode = (EWD426Node)getFirstNeighborByName((String)e.getOldValue());
+					EWD426Node newPrevNode = (EWD426Node)getFirstNeighborByName((String)e.getNewValue());
+					updatePrevNodeDirection(oldPrevNode,newPrevNode);
+				}
+			}
+		});
 	}
 	
 	public void init()
@@ -17,6 +36,34 @@ public class EWD426Node extends Node
 		setTokenValue(0);
 		setPrevNode(null);
 		setHasToken(false);
+	}
+	
+	private void updatePrevNodeDirection(EWD426Node oldPrevNode, EWD426Node newPrevNode)
+	{
+		Direction parentDir = getNeighborDirection(oldPrevNode);
+		if (parentDir != null)
+		{
+			if (parentDir.equals(Direction.Other))
+			{
+				setNeighborDirection(oldPrevNode, Direction.None);
+			}
+			else if (parentDir.equals(Direction.Both))
+			{
+				setNeighborDirection(oldPrevNode, Direction.Default);
+			}
+		}
+		parentDir = getNeighborDirection(newPrevNode);
+		if (parentDir != null)
+		{
+			if (parentDir.equals(Direction.None))
+			{
+				setNeighborDirection(newPrevNode, Direction.Other);
+			}
+			else if (parentDir.equals(Direction.Default))
+			{
+				setNeighborDirection(newPrevNode, Direction.Both);
+			}
+		}
 	}
 	
 	public void setPrevNode(String nodeName)

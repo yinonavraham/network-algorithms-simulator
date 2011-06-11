@@ -126,7 +126,8 @@ public class MainWindow extends JFrame
 
 	public MainWindow()
 	{
-		super("Network Algorithms Simulator");
+		super();
+		updateWindowTitle();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(800, 600);
         setLocationRelativeTo(null);
@@ -137,6 +138,12 @@ public class MainWindow extends JFrame
 			"Welcome!\n" +
 			"In order to start, please create a new network " +
 			"or open an existing one from the file system.");
+	}
+	
+	private void updateWindowTitle()
+	{
+		String suffix = _currentFile != null ? " - " + _currentFile.getName() : "";
+		setTitle("Network Algorithms Simulator" + suffix);
 	}
 	
 	// #######################################################################
@@ -841,6 +848,7 @@ public class MainWindow extends JFrame
 				_commands.clear();
 				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 				_currentFile = file;
+				updateWindowTitle();
 				setEditMode();
 				onAllowEditChanged(true);
 				onEditModeSelected(Mode.Move);
@@ -892,6 +900,7 @@ public class MainWindow extends JFrame
 				serializer.setAlgorithmDescriptor(_algDescriptor);
 				serializer.serialize(file);
 				_currentFile = file;
+				updateWindowTitle();
 			}
 		}
 		catch (SerializationException ex)
