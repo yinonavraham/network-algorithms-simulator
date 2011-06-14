@@ -5,8 +5,9 @@ import ynn.network.model.INodeListener;
 import ynn.network.model.Node;
 import ynn.network.model.NodeAttributeEvent;
 import ynn.network.model.NodeNeighborEvent;
+import ynn.network.ui.IAnnotationProvider;
 
-public class Aky90Node extends Node
+public class Aky90Node extends Node implements IAnnotationProvider
 {	
 	public Aky90Node()
 	{
@@ -238,5 +239,21 @@ public class Aky90Node extends Node
 	public boolean isRoot()
 	{
 		return getRootId().equals(getId()) && getParentId().equals(getId()) && getDistance() == 0;
+	}
+
+	@Override
+	public String getAnnotationText()
+	{
+		if (getDirection() != null)
+		{
+			switch (getDirection())
+			{
+			case Ask:
+				return String.format("%s (%s) %s %s", getFrom(), getRequest(), getDirection(), getTo());
+			case Grant:
+				return String.format("%s %s %s (%s)", getTo(), getDirection(), getFrom(), getRequest());
+			}	
+		}
+		return null;
 	}
 }
