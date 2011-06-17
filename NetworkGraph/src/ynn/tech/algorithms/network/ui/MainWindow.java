@@ -1016,7 +1016,8 @@ public class MainWindow extends JFrame
 	
 	private void onAbout()
 	{
-		// TODO
+		About about = new About(this);
+		about.setVisible(true);
 	}
 	
 	// #######################################################################
