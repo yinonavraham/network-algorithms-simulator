@@ -108,6 +108,7 @@ public class MainWindow extends JFrame
 	private JSplitPane _splitter;
 	private JTextPane _console;
 	private AttributesView _attributesView;
+	private AlgorithmDetailsPanel _algorithmDetailsView;
 	private JTabbedPane _tabbedPane;
 	
     private NetworkView _networkView;
@@ -195,6 +196,10 @@ public class MainWindow extends JFrame
 			}
 		});
 		_tabbedPane.addTab("Attributes", Icons.getClipboard(), _attributesView);
+		// Algorithm Details Tab
+		_algorithmDetailsView = new AlgorithmDetailsPanel();
+		_algorithmDetailsView.setBorder(BorderFactory.createLoweredBevelBorder());
+		_tabbedPane.addTab("Algorithm", Icons.getAlgorithm(), new JScrollPane(_algorithmDetailsView));
 	}
 
 	private void initializeNetworkView()
@@ -246,7 +251,7 @@ public class MainWindow extends JFrame
 		_toolBarFile = new JToolBar();
 		
 		_toolBarFileNew = new JButton(Icons.getNew());
-		_toolBarFileNew.setToolTipText("New File");
+		_toolBarFileNew.setToolTipText("New Model");
 		_toolBarFileNew.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -258,7 +263,7 @@ public class MainWindow extends JFrame
 		_toolBarFile.add(_toolBarFileNew);
 
 		_toolBarFileOpen = new JButton(Icons.getOpen());
-		_toolBarFileOpen.setToolTipText("Open File");
+		_toolBarFileOpen.setToolTipText("Open Model");
 		_toolBarFileOpen.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -270,7 +275,7 @@ public class MainWindow extends JFrame
 		_toolBarFile.add(_toolBarFileOpen);
 
 		_toolBarFileSave = new JButton(Icons.getSave());
-		_toolBarFileSave.setToolTipText("Save File");
+		_toolBarFileSave.setToolTipText("Save Model");
 		_toolBarFileSave.addActionListener(new ActionListener()
 		{	
 			@Override
@@ -718,6 +723,12 @@ public class MainWindow extends JFrame
 		return _algExececuter == null ? 0 : _algExececuter.getTime();
 	}
 	
+	private void setAlgorithmDescriptor(AlgorithmDescriptor descriptor)
+	{
+		_algDescriptor = descriptor;
+		_algorithmDetailsView.setAlgorithmDescriptor(descriptor);
+	}
+	
 	private void writeToConsole(String[] strings, boolean isError)
 	{
 		Color c = isError ? Color.RED : Color.BLACK;
@@ -814,7 +825,7 @@ public class MainWindow extends JFrame
 		if (descriptor != null)
 		{
 			_nodeId = 1;
-			_algDescriptor = descriptor;
+			setAlgorithmDescriptor(descriptor);
 			initializeNetworkView();
 			_commands.clear();
 			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
@@ -844,7 +855,7 @@ public class MainWindow extends JFrame
 				validate();
 				NetworkSerializer serializer = new NetworkSerializer(_networkView);
 				serializer.deserialize(file);
-				_algDescriptor = serializer.getAlgorithmDescriptor();
+				setAlgorithmDescriptor(serializer.getAlgorithmDescriptor());
 				_commands.clear();
 				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 				_currentFile = file;
@@ -868,7 +879,7 @@ public class MainWindow extends JFrame
 			enableEdit(false);
 			enableSave(false);
 			enablePlay(false);
-			_algDescriptor = null;
+			setAlgorithmDescriptor(null);
 		}
 	}
 
