@@ -119,6 +119,7 @@ public class MainWindow extends JFrame
     
     private int _nodeId = 1;
 	private File _currentFile = null;
+	private File _currentDir = null;
     private AlgorithmDescriptor[] _algDescriptors = new AlgorithmDescriptor[] {
     	new Aky90Descriptor(),
     	new EWD426Descriptor()
@@ -825,6 +826,8 @@ public class MainWindow extends JFrame
 		if (descriptor != null)
 		{
 			_nodeId = 1;
+			_currentFile = null;
+			updateWindowTitle();
 			setAlgorithmDescriptor(descriptor);
 			initializeNetworkView();
 			_commands.clear();
@@ -843,7 +846,7 @@ public class MainWindow extends JFrame
 		File file = null;
 		try
 		{
-			JFileChooser dialog = new JFileChooser(_currentFile);
+			JFileChooser dialog = new JFileChooser(_currentDir);
 			dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			dialog.setMultiSelectionEnabled(false);
 			dialog.setAcceptAllFileFilterUsed(false);
@@ -859,6 +862,7 @@ public class MainWindow extends JFrame
 				_commands.clear();
 				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 				_currentFile = file;
+				_currentDir = file;
 				updateWindowTitle();
 				setEditMode();
 				onAllowEditChanged(true);
@@ -894,7 +898,7 @@ public class MainWindow extends JFrame
 		{
 			if (file == null)
 			{
-				JFileChooser dialog = new JFileChooser(_currentFile);
+				JFileChooser dialog = new JFileChooser(_currentDir);
 				dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				dialog.setMultiSelectionEnabled(false);
 				dialog.setAcceptAllFileFilterUsed(false);
@@ -903,6 +907,10 @@ public class MainWindow extends JFrame
 				if (dialog.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 				{
 					file = dialog.getSelectedFile();
+					if (!file.getName().toLowerCase().toLowerCase().endsWith(".nas"))
+					{
+						file = new File(file.getAbsolutePath() + ".nas");
+					}
 				}
 			}
 			if (file != null)
@@ -911,6 +919,7 @@ public class MainWindow extends JFrame
 				serializer.setAlgorithmDescriptor(_algDescriptor);
 				serializer.serialize(file);
 				_currentFile = file;
+				_currentDir = file;
 				updateWindowTitle();
 			}
 		}
