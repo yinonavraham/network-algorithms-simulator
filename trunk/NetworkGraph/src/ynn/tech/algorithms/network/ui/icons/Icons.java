@@ -125,6 +125,11 @@ public class Icons
 		return getIcon("hot/Undo.png");
 	}
 	
+	public static Icon getAlgorithm()
+	{
+		return getIcon("Scroll.png");
+	}
+	
 	public static Image getNetwork()
 	{
 		return new ImageIcon(getResource("network.png")).getImage();
