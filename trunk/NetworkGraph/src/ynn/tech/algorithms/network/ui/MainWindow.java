@@ -863,6 +863,7 @@ public class MainWindow extends JFrame
 				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
 				_currentFile = file;
 				_currentDir = file;
+				_nodeId = getMaxNodeId(_networkModel) + 1;
 				updateWindowTitle();
 				setEditMode();
 				onAllowEditChanged(true);
@@ -885,6 +886,25 @@ public class MainWindow extends JFrame
 			enablePlay(false);
 			setAlgorithmDescriptor(null);
 		}
+	}
+
+	private int getMaxNodeId(NetworkModel network)
+	{
+		int maxId = 1;
+		for (Node node : network.getNodes())
+		{
+			int id;
+			try
+			{
+				id = Integer.parseInt(node.getName());
+			}
+			catch (NumberFormatException e)
+			{
+				id = 1;
+			}
+			maxId = Math.max(id, maxId);
+		}
+		return maxId;
 	}
 
 	private void onSave()
