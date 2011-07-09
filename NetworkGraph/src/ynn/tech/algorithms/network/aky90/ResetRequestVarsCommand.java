@@ -9,10 +9,17 @@ public class ResetRequestVarsCommand implements Command
 {
 	private CompositeCommand _command;
 	private Node _node;
+	private String _message;
 	
 	public ResetRequestVarsCommand(Node node)
 	{
+		this(node,null);
+	}
+	
+	public ResetRequestVarsCommand(Node node, String message)
+	{
 		_node = node;
+		_message = message;
 		_command = new CompositeCommand();
 		Aky90NodeAttributes attr = new Aky90NodeAttributes();
 		_command.add(new SetNodeAttributeCommand(
@@ -46,6 +53,7 @@ public class ResetRequestVarsCommand implements Command
 	@Override
 	public String toString()
 	{
-		return String.format("%s: Reset Request varialbes", _node);
+		String suffix = _message == null ? "" : " - " + _message;
+		return String.format("%s: Reset Request varialbes%s", _node, suffix);
 	}
 }

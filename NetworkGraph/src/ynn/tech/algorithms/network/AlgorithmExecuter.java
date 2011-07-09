@@ -11,7 +11,6 @@ public class AlgorithmExecuter
 	private NetworkAlgorithm _algorithm;
 	private NetworkModel _network;
 	private CommandStack _commands;
-    private int _time;
 	
 	public AlgorithmExecuter(AlgorithmDescriptor descriptor, NetworkModel network, CommandStack commands)
 	{
@@ -19,7 +18,6 @@ public class AlgorithmExecuter
 		_algorithm = _descriptor.getUtilities().createAlgorithm();
 		_network = network;
 		_commands = commands;
-		_time = 0;
 	}
 	
 	public AlgorithmDescriptor getDescriptor()
@@ -37,7 +35,6 @@ public class AlgorithmExecuter
 		while (_commands.canUndo())
 		{
 			_commands.undo();
-			_time--;
 		}
 	}
 	
@@ -48,20 +45,17 @@ public class AlgorithmExecuter
 		_commands.executeCommand(context.getCommands());
 		List<String> strings = new ArrayList<String>(10);
 		commandToStrings(context.getCommands(),strings);
-		_time++;
 		return strings.toArray(new String[strings.size()]);
 	}
 	
 	private void commandToStrings(Command command, List<String> strings)
 	{
+		String s = command.toString();
+		if (s != null & !s.isEmpty()) strings.add(s);
 		if (command instanceof CompositeCommand)
 		{
 			for (Command cmd : ((CompositeCommand)command).getCommands())
 				commandToStrings(cmd, strings);
-		}
-		else
-		{
-			strings.add(command.toString());
 		}
 	}
 
@@ -70,12 +64,6 @@ public class AlgorithmExecuter
 		if (_commands.canUndo()) 
 		{
 			_commands.undo();
-			_time--;
 		}
-	}
-	
-	public int getTime()
-	{
-		return _time;
 	}
 }

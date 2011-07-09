@@ -10,13 +10,20 @@ public class SetNodeAttributeCommand implements Command
 	protected Object _value;
 	protected Object _oldValue;
 	private boolean _executed;
+	protected String _message;
 	
 	public SetNodeAttributeCommand(Node node, Attribute attribute, Object value)
+	{
+		this(node,attribute,value,null);
+	}
+	
+	public SetNodeAttributeCommand(Node node, Attribute attribute, Object value, String message)
 	{
 		_node = node;
 		_attr = attribute;
 		_value = value;
 		_executed = false;
+		_message = message;
 	}
 
 	@Override
@@ -56,6 +63,7 @@ public class SetNodeAttributeCommand implements Command
 	@Override
 	public String toString()
 	{  
-		return String.format("%s: Set %s: %s -> %s", _node, _attr, ""+_oldValue, ""+_value);
+		String suffix = _message == null ? "" : " - " + _message;
+		return String.format("%s: Set %s: %s -> %s%s", _node, _attr, ""+_oldValue, ""+_value, suffix);
 	}
 }

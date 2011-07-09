@@ -71,4 +71,9 @@ public class CommandStack
 	{
 		return _currentCmd >= 0 && _commands.get(_currentCmd).canUndo();
 	}
+	
+	public int size()
+	{
+		return _commands.size();
+	}
 }

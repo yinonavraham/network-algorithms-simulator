@@ -1,6 +1,11 @@
 package ynn.tech.algorithms.network.aky90;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import ynn.network.model.Node;
+import ynn.tech.algorithms.network.Command;
+import ynn.tech.algorithms.network.CompositeCommand;
 import ynn.tech.algorithms.network.NetworkAlgorithm;
 import ynn.tech.algorithms.network.SetNodeAttributeCommand;
 import ynn.tech.algorithms.network.StepContext;
@@ -17,6 +22,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 	@Override
 	public void performStep(StepContext context)
 	{
+		Map<Node, Command> actions = new LinkedHashMap<Node, Command>();
 		for (Node vNode : context.getNetwork().getNodes())
 		{
 			/*
@@ -27,31 +33,37 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			for (Node uNode : v.getNeighbors())
 			{
 				Aky90Node u = (Aky90Node)uNode;
-				action1(context,v); 
-				action2(context,v,u);
-				action3(context,v);
-				action4(context,v);
-				action5(context,v);
-				action6(context,v);
-				action7(context,v,u);
-				action8(context,v,u);
+				action1(context,actions,v); 
+				action2(context,actions,v,u);
+				action3(context,actions,v);
+				action4(context,actions,v);
+				action5(context,actions,v);
+				action6(context,actions,v);
+				action7(context,actions,v,u);
+				action8(context,actions,v,u);
 			}
+		}
+		for (Command cmd : actions.values())
+		{
+			context.getCommands().add(cmd);
 		}
 	}
 	
-	private boolean action1(StepContext context, Aky90Node v)
+	private boolean action1(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		boolean guard = 
 			!condition1(v) && 
 			!condition1Prime(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new SetAsRootCommand(v));
+			String message = "Action1: " +
+					"A node that notices that conditions C1 and C1' do not hold, must become a root.";
+			actions.put(v, new SetAsRootCommand(v, message));
 		}
 		return guard;
 	}
 	
-	private boolean action2(StepContext context, Aky90Node v, Aky90Node u)
+	private boolean action2(StepContext context, Map<Node, Command> actions, Aky90Node v, Aky90Node u)
 	{
 		Aky90Node x = v.getNeghiborWithMaxRoot();
 		boolean guard = 
@@ -60,31 +72,47 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			u.getRootId().compareToIgnoreCase(v.getRootId()) > 0;
 		if (guard == true)
 		{
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.REQUEST), v.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.FROM), v.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.TO), u.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+			// Check that the variables are indeed different than what it suppose to be
+			if (!v.getId().equals(v.getRequest()) ||
+				!v.getId().equals(v.getFrom()) ||
+				!u.getId().equals(v.getTo()) || 
+				!DirectionEnum.Ask.equals(v.getDirection()))
+			{
+				String message = v + " - Action 2: " +
+						"Condition C1' holds at the node and there is a neighbor with root higher " +
+						"than the current root of the node - move on to the process of joining " +
+						"a tree with a larger root (the tree that " + u + " belongs to)";
+				CompositeCommand cmd = new CompositeCommand(message);
+				cmd.add(new SetNodeAttributeCommand(
+					v, _attr.getByName(Aky90NodeAttributes.REQUEST), v.getId()));
+				cmd.add(new SetNodeAttributeCommand(
+					v, _attr.getByName(Aky90NodeAttributes.FROM), v.getId()));
+				cmd.add(new SetNodeAttributeCommand(
+					v, _attr.getByName(Aky90NodeAttributes.TO), u.getId()));
+				cmd.add(new SetNodeAttributeCommand(
+					v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+				actions.put(v, cmd);
+			}
+			else actions.put(v, new EmptyCommand());
 		}
 		return guard;
 	}
 	
-	private boolean action3(StepContext context, Aky90Node v)
+	private boolean action3(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		boolean guard = 
 			condition1(v) &&
 			!condition2(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new ResetRequestVarsCommand(v));
+			String message = "Action 3: " +
+					"C1 holds but C2 does not - the node must reset the request variables.";
+			actions.put(v, new ResetRequestVarsCommand(v,message));
 		}
 		return guard;
 	}
 	
-	private boolean action4(StepContext context, Aky90Node v)
+	private boolean action4(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		Aky90Node w = null;
 		for (Node node : v.getNeighbors())
@@ -107,19 +135,23 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			!condition2Prime(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new SetNodeAttributeCommand(
+			String message = v + " - Action 4: " +
+					"Forward a request from the requesting node: " + w;
+			CompositeCommand cmd = new CompositeCommand(message);
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.REQUEST), w.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+			actions.put(v, cmd);
 		}
 		return guard;
 	}
 	
-	private boolean action5(StepContext context, Aky90Node v)
+	private boolean action5(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		Aky90Node w = null;
 		for (Node node : v.getNeighbors())
@@ -140,19 +172,23 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			!condition2Prime(v);
 		if (guard == true)
 		{
-			context.getCommands().add(new SetNodeAttributeCommand(
+			String message = v+ " - Action 5: " +
+					"Forward a request from " + w + ", requested by " + w.getRequest();
+			CompositeCommand cmd = new CompositeCommand(message);
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.REQUEST), w.getRequest()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.FROM), w.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.TO), v.getParentId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Ask));
+			actions.put(v, cmd);
 		}
 		return guard;
 	}
 	
-	private boolean action6(StepContext context, Aky90Node v)
+	private boolean action6(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		boolean guard = 
 			condition1(v) &&
@@ -161,13 +197,16 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			v.getDirection().equals(DirectionEnum.Ask);
 		if (guard == true)
 		{
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
+			String message = "Action 6: Grant the request. " +
+					v + " is forwarding a request (i.e. C2' holds at " + v + ")" +
+					" and it is a root. Hence, it can grant the request.";
+			actions.put(v, new SetNodeAttributeCommand(
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant, message));
 		}
 		return guard;
 	}
 	
-	private boolean action7(StepContext context, Aky90Node v, Aky90Node u)
+	private boolean action7(StepContext context, Map<Node, Command> actions, Aky90Node v, Aky90Node u)
 	{
 		boolean guard = 
 			condition1(v) &&
@@ -180,13 +219,15 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			u.getFrom().equals(v.getId());
 		if (guard == true)
 		{
-			context.getCommands().add(new SetNodeAttributeCommand(
-				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant));
+			String message = "Action 7: Forward the Grant message from " + u + 
+					", requested by " + v.getRequest();
+			actions.put(v, new SetNodeAttributeCommand(
+				v, _attr.getByName(Aky90NodeAttributes.DIRECTION), DirectionEnum.Grant, message));
 		}
 		return guard;
 	}
 	
-	private boolean action8(StepContext context, Aky90Node v, Aky90Node u)
+	private boolean action8(StepContext context, Map<Node, Command> actions, Aky90Node v, Aky90Node u)
 	{
 		boolean guard = 
 			condition1Prime(v) &&
@@ -201,12 +242,16 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			v.getTo().equals(u.getId());
 		if (guard == true)
 		{
-			context.getCommands().add(new SetParentCommand(v, u.getId()));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			String message = v+ " - Action 8: " +
+					"The request of " + v + " has been granted, it joins the tree of " + u.getRootId();
+			CompositeCommand cmd = new CompositeCommand(message);
+			cmd.add(new SetParentCommand(v, u.getId()));
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.DISTANCE), u.getDistance()+1));
-			context.getCommands().add(new SetNodeAttributeCommand(
+			cmd.add(new SetNodeAttributeCommand(
 				v, _attr.getByName(Aky90NodeAttributes.ROOT), u.getRootId()));
-			context.getCommands().add(new ResetRequestVarsCommand(v));
+			cmd.add(new ResetRequestVarsCommand(v));
+			actions.put(v, cmd);
 		}
 		return guard;
 	}
