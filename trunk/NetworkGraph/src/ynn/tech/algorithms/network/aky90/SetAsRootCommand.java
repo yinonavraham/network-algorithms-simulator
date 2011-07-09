@@ -9,10 +9,17 @@ public class SetAsRootCommand implements Command
 {
 	private CompositeCommand _command;
 	private Node _node;
+	private String _message;
 	
 	public SetAsRootCommand(Node node)
 	{
+		this(node,null);
+	}
+	
+	public SetAsRootCommand(Node node, String message)
+	{
 		_node = node;
+		_message = message;
 		_command = new CompositeCommand();
 		Aky90Node akyNode = (Aky90Node)node;
 		Aky90NodeAttributes attr = new Aky90NodeAttributes();
@@ -42,6 +49,7 @@ public class SetAsRootCommand implements Command
 	@Override
 	public String toString()
 	{
-		return String.format("%s: Set as root", _node);
+		String suffix = _message == null ? "" : " - " + _message;
+		return String.format("%s: Set as root%s", _node, suffix);
 	}
 }

@@ -78,6 +78,15 @@ public class NodeAttributesTableModel implements TableModel
 		}
 	}
 
+	private void fireValueSetEvent(NodeAttributesTableModelEvent e)
+	{
+		for (TableModelListener l : _listeners)
+		{
+			if (l instanceof NodeAttributesTableModelListener)
+				((NodeAttributesTableModelListener)l).valueSet(e);
+		}
+	}
+
 	@Override
 	public void addTableModelListener(TableModelListener l)
 	{
@@ -137,9 +146,18 @@ public class NodeAttributesTableModel implements TableModel
 		if (colIndex == 1)
 		{
 			Class<?> type = _orderedAttributes[rowIndex].getType();
+			Object oldValue = _node.getAttributeValue(_orderedAttributes[rowIndex]);
 			if (type.isInstance(value))
 			{
-				_node.putAttribute(_orderedAttributes[rowIndex],value);
+				if (oldValue != value && value != null && !value.equals(oldValue))
+				{
+					_node.putAttribute(_orderedAttributes[rowIndex],value);
+					NodeAttributesTableModelEvent e = 
+						new NodeAttributesTableModelEvent(
+							this, rowIndex, colIndex, null, String.format(
+								"Value was set to ", ""+value));
+					fireValueSetEvent(e);
+				}
 			}
 			else
 			{
@@ -147,9 +165,14 @@ public class NodeAttributesTableModel implements TableModel
 				{
 					Method mValueOf = type.getMethod("valueOf",String.class);
 					Object res = mValueOf.invoke(null, value);
-					if (res != null && type.isInstance(res))
+					if (res != null && type.isInstance(res) && !res.equals(oldValue))
 					{
 						_node.putAttribute(_orderedAttributes[rowIndex],res);
+						NodeAttributesTableModelEvent e = 
+							new NodeAttributesTableModelEvent(
+								this, rowIndex, colIndex, null, String.format(
+									"Value was set to ", ""+res));
+						fireValueSetEvent(e);
 					}
 					else
 					{

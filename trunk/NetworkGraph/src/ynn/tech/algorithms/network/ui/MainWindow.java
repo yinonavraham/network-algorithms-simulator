@@ -61,7 +61,9 @@ import ynn.tech.algorithms.network.AlgorithmExecuter;
 import ynn.tech.algorithms.network.CommandStack;
 import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
 import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
+import ynn.tech.algorithms.network.ui.attributes.AttributeChangedEvent;
 import ynn.tech.algorithms.network.ui.attributes.AttributesView;
+import ynn.tech.algorithms.network.ui.attributes.AttributesViewListener;
 import ynn.tech.algorithms.network.ui.icons.Icons;
 
 public class MainWindow extends JFrame
@@ -116,6 +118,7 @@ public class MainWindow extends JFrame
     private NetworkAdapter _networkAdapter;
     private AlgorithmExecuter _algExececuter = null;
     private CommandStack _commands;
+    private int _time;
     
     private int _nodeId = 1;
 	private File _currentFile = null;
@@ -196,11 +199,25 @@ public class MainWindow extends JFrame
 				handleErrorOccured(source,ex,message);
 			}
 		});
-		_tabbedPane.addTab("Attributes", Icons.getClipboard(), _attributesView);
+		_attributesView.addAttributesViewListener(new AttributesViewListener()
+		{
+			@Override
+			public void attributeChangedManually(AttributeChangedEvent e)
+			{
+				resetCommandStack();
+			}
+		});
+		_tabbedPane.addTab("Variables", Icons.getClipboard(), _attributesView);
 		// Algorithm Details Tab
 		_algorithmDetailsView = new AlgorithmDetailsPanel();
 		_algorithmDetailsView.setBorder(BorderFactory.createLoweredBevelBorder());
 		_tabbedPane.addTab("Algorithm", Icons.getAlgorithm(), new JScrollPane(_algorithmDetailsView));
+	}
+
+	protected void resetCommandStack()
+	{
+		_commands.clear();
+		enableStepBack(false);
 	}
 
 	private void initializeNetworkView()
@@ -703,7 +720,7 @@ public class MainWindow extends JFrame
 	{
 		_playMenu.setEnabled(enabled);
 		_toolBarPlayNext.setEnabled(enabled);
-		_toolBarPlayPrev.setEnabled(enabled);
+		_toolBarPlayPrev.setEnabled(enabled && _commands.canUndo());
 	}
 	
 	private void enableSave(boolean enabled)
@@ -721,7 +738,7 @@ public class MainWindow extends JFrame
 	
 	private int getSimulationTime()
 	{
-		return _algExececuter == null ? 0 : _algExececuter.getTime();
+		return _time;
 	}
 	
 	private void setAlgorithmDescriptor(AlgorithmDescriptor descriptor)
@@ -738,6 +755,8 @@ public class MainWindow extends JFrame
 	
 	private void writeToConsole(String[] strings, Color c)
 	{
+		_console.setSelectionStart(0);
+		_console.setSelectionEnd(0);
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
 	        StyleConstants.Foreground, c);
@@ -832,6 +851,8 @@ public class MainWindow extends JFrame
 			initializeNetworkView();
 			_commands.clear();
 			_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
+			_time = 0;
+			enableStepBack(false);
 			updateSimulationTime();
 			validate();
 			setEditMode();
@@ -861,6 +882,8 @@ public class MainWindow extends JFrame
 				setAlgorithmDescriptor(serializer.getAlgorithmDescriptor());
 				_commands.clear();
 				_algExececuter = new AlgorithmExecuter(_algDescriptor, _networkModel, _commands);
+				_time = 0;
+				enableStepBack(false);
 				_currentFile = file;
 				_currentDir = file;
 				_nodeId = getMaxNodeId(_networkModel) + 1;
@@ -1025,6 +1048,8 @@ public class MainWindow extends JFrame
 		if (_algExececuter != null)
 		{
 			String[] strings = _algExececuter.stepForward();
+			_time++;
+			enableStepBack(true);
 			updateSimulationTime();
 			writeToConsole("Step at t = " + getSimulationTime(),Color.BLUE);
 			writeToConsole(strings);
@@ -1032,11 +1057,19 @@ public class MainWindow extends JFrame
 		}
 	}
 
+	private void enableStepBack(boolean enable)
+	{
+		_toolBarPlayPrev.setEnabled(enable);
+		_playMenuPrev.setEnabled(enable);
+	}
+
 	private void onSimulationStepBack()
 	{
 		if (_algExececuter != null)
 		{
 			_algExececuter.stepBack();
+			_time--;
+			enableStepBack(_commands.canUndo());
 			writeToConsole("Undo step, back to t = " + getSimulationTime(),Color.BLUE);
 			updateSimulationTime();
 			_networkView.repaint();

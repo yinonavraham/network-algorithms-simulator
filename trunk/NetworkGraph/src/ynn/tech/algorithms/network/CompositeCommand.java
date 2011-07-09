@@ -6,10 +6,17 @@ import java.util.List;
 public class CompositeCommand implements Command
 {
 	private List<Command> _commands;
+	private String _message;
 	
 	public CompositeCommand()
 	{
+		this(null);
+	}
+	
+	public CompositeCommand(String message)
+	{
 		_commands = new LinkedList<Command>();
+		_message = message;
 	}
 	
 	public void add(Command cmd)
@@ -53,6 +60,12 @@ public class CompositeCommand implements Command
 			if (!cmd.canUndo()) return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return _message == null ? "" : _message;
 	}
 
 }

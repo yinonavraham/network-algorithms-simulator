@@ -1,6 +1,7 @@
 package ynn.tech.algorithms.network.ui.attributes;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,12 +23,14 @@ public class AttributesView extends JPanel
 	private JTable _table;
 	private TableColumn _colName;
 	private TableColumn _colValue;
+	private List<AttributesViewListener> _listeners;
 	private List<ErrorOccurredListener> _errorListeners;
 	
 	public AttributesView()
 	{
 		super();
 		_errorListeners = new LinkedList<ErrorOccurredListener>();
+		_listeners = new ArrayList<AttributesViewListener>();
 		setLayout(new BorderLayout());
 		_table = new JTable();
 		initEmptyTable();
@@ -48,7 +51,7 @@ public class AttributesView extends JPanel
 		}
 	}
 	
-	public void setNodeAttributes(Node node)
+	public void setNodeAttributes(final Node node)
 	{
 		if (node != null)
 		{
@@ -62,6 +65,12 @@ public class AttributesView extends JPanel
 				public void valueParseError(NodeAttributesTableModelEvent e)
 				{
 					fireErrorOccurred(e.getException(), e.getMessage());
+				}
+				@Override
+				public void valueSet(NodeAttributesTableModelEvent e)
+				{
+					AttributeChangedEvent acme = new AttributeChangedEvent(node, null, null, null);
+					fireAttributeChangedManually(acme);
 				}
 			});
 			_table.setModel(model);
@@ -98,6 +107,24 @@ public class AttributesView extends JPanel
 		for (int i = 0; i < _errorListeners.size(); i++)
 		{
 			_errorListeners.get(i).errorOccurred(this, e, message);
+		}
+	}
+	
+	public void addAttributesViewListener(AttributesViewListener l)
+	{
+		_listeners.add(l);
+	}
+	
+	public void removeAttributesViewListener(AttributesViewListener l)
+	{
+		_listeners.remove(l);
+	}
+	
+	protected void fireAttributeChangedManually(AttributeChangedEvent e)
+	{
+		for (int i = 0; i < _listeners.size(); i++)
+		{
+			_listeners.get(i).attributeChangedManually(e);
 		}
 	}
 }
