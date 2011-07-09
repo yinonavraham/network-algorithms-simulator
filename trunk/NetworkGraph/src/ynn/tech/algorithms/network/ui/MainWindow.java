@@ -755,8 +755,8 @@ public class MainWindow extends JFrame
 	
 	private void writeToConsole(String[] strings, Color c)
 	{
-		_console.setSelectionStart(0);
-		_console.setSelectionEnd(0);
+		_console.setSelectionStart(_console.getText().length()-1);
+		_console.setSelectionEnd(_console.getText().length()-1);
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
 	        StyleConstants.Foreground, c);

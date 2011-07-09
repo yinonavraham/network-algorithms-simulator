@@ -1,6 +1,8 @@
 package ynn.tech.algorithms.network.aky90;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import ynn.network.model.Node;
@@ -56,11 +58,60 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			!condition1Prime(v);
 		if (guard == true)
 		{
+			List<String> reasons = getNotCondition1Reasons(v);
 			String message = "Action1: " +
 					"A node that notices that conditions C1 and C1' do not hold, must become a root.";
+			message += reasonsToString(reasons);
 			actions.put(v, new SetAsRootCommand(v, message));
 		}
 		return guard;
+	}
+	
+	private String reasonsToString(List<String> reasons)
+	{
+		StringBuilder sb = new StringBuilder();
+		if (reasons.size() > 0)
+		{
+			sb.append(" (Reasons: ");
+			for (int i = 0; i < reasons.size(); i++)
+			{
+				if (i > 0) sb.append("; ");
+				sb.append(reasons.get(i));
+			}
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	private List<String> getNotCondition1Reasons(Aky90Node v)
+	{
+		List<String> reasons = new ArrayList<String>();
+		Aky90Node parent = (Aky90Node)v.getParent();
+		if (!(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0))
+		{
+			reasons.add(v + " is not a root");
+		}
+		if (!v.isNeighborOf(parent))
+		{
+			reasons.add(v + " is not a neighbor of its parent");
+		}
+		if (!(v.getRootId().compareToIgnoreCase(v.getId()) > 0))
+		{
+			reasons.add(v + " has an ID higher than its root");
+		}
+		if (!v.getRootId().equals(parent.getRootId()))
+		{
+			reasons.add("The root of " + v + " is different than its parent's");
+		}
+		if (!(v.getDistance() == parent.getDistance() + 1))
+		{
+			reasons.add("The distance of " + v + " does not match its parent's");
+		}
+		if (!(v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) >= 0))
+		{
+			reasons.add("The root of " + v + " is not the max available root ID");
+		}
+		return reasons;
 	}
 	
 	private boolean action2(StepContext context, Map<Node, Command> actions, Aky90Node v, Aky90Node u)
@@ -97,7 +148,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		}
 		return guard;
 	}
-	
+
 	private boolean action3(StepContext context, Map<Node, Command> actions, Aky90Node v)
 	{
 		boolean guard = 
@@ -107,9 +158,39 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		{
 			String message = "Action 3: " +
 					"C1 holds but C2 does not - the node must reset the request variables.";
+			message += reasonsToString(getNotCondition2Reasons(v));
 			actions.put(v, new ResetRequestVarsCommand(v,message));
 		}
 		return guard;
+	}
+	
+	private List<String> getNotCondition2Reasons(Aky90Node v)
+	{
+		List<String> reasons = new ArrayList<String>();
+		if (!condition2Prime(v))
+		{
+			reasons.add(v + " is not forwarding a request, based on its neighbors' request variables");
+		}
+		else
+		{
+			if (!v.getRequest().equals(Aky90NodeAttributes.UNDEFINED_REQUEST))
+			{
+				reasons.add("Request var in " + v + " is not undefined");
+			}
+			if (!v.getTo().equals(Aky90NodeAttributes.UNDEFINED_TO))
+			{
+				reasons.add("To var in " + v + " is not undefined");
+			}
+			if (!v.getFrom().equals(Aky90NodeAttributes.UNDEFINED_FROM))
+			{
+				reasons.add("From var in " + v + " is not undefined");
+			}
+			if (!v.getDirection().equals(Aky90NodeAttributes.UNDEFINED_DIRECTION))
+			{
+				reasons.add("Direction var in " + v + " is not undefined");
+			}
+		}
+		return reasons;
 	}
 	
 	private boolean action4(StepContext context, Map<Node, Command> actions, Aky90Node v)
