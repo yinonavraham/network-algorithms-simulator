@@ -91,21 +91,28 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		{
 			reasons.add(v + " is not a root");
 		}
-		if (!v.isNeighborOf(parent))
+		if (parent != null)
 		{
-			reasons.add(v + " is not a neighbor of its parent");
+			if (!v.isNeighborOf(parent))
+			{
+				reasons.add(v + " is not a neighbor of its parent");
+			}
+			if (!v.getRootId().equals(parent.getRootId()))
+			{
+				reasons.add("The root of " + v + " is different than its parent's");
+			}
+			if (!(v.getDistance() == parent.getDistance() + 1))
+			{
+				reasons.add("The distance of " + v + " does not match its parent's");
+			}
+		}
+		else
+		{
+			reasons.add("The parent of " + v + " is no longer connected");
 		}
 		if (!(v.getRootId().compareToIgnoreCase(v.getId()) > 0))
 		{
 			reasons.add(v + " has an ID higher than its root");
-		}
-		if (!v.getRootId().equals(parent.getRootId()))
-		{
-			reasons.add("The root of " + v + " is different than its parent's");
-		}
-		if (!(v.getDistance() == parent.getDistance() + 1))
-		{
-			reasons.add("The distance of " + v + " does not match its parent's");
 		}
 		if (!(v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) >= 0))
 		{
