@@ -110,11 +110,11 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		{
 			reasons.add("The parent of " + v + " is no longer connected");
 		}
-		if (!(v.getRootId().compareToIgnoreCase(v.getId()) > 0))
+		if (!(compareIds(v.getRootId(),v.getId()) > 0))
 		{
 			reasons.add(v + " has an ID higher than its root");
 		}
-		if (!(v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) >= 0))
+		if (!(compareIds(v.getRootId(),v.getMaxNeghiborRoot()) >= 0))
 		{
 			reasons.add("The root of " + v + " is not the max available root ID");
 		}
@@ -127,7 +127,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		boolean guard = 
 			condition1Prime(v) &&
 			u.getRootId().equals(x.getRootId()) &&
-			u.getRootId().compareToIgnoreCase(v.getRootId()) > 0;
+			compareIds(u.getRootId(),v.getRootId()) > 0;
 		if (guard == true)
 		{
 			// Check that the variables are indeed different than what it suppose to be
@@ -361,9 +361,9 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		Aky90Node parent = (Aky90Node)v.getParent();
 		return (
 			(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0) ||
-			v.getRootId().compareToIgnoreCase(v.getId()) > 0 && v.isNeighborOf(parent) && 
+			compareIds(v.getRootId(),v.getId()) > 0 && v.isNeighborOf(parent) && 
 			v.getRootId().equals(parent.getRootId()) && v.getDistance() == parent.getDistance() + 1) &&
-			v.getRootId().compareToIgnoreCase(v.getMaxNeghiborRoot()) >= 0;
+			compareIds(v.getRootId(),v.getMaxNeghiborRoot()) >= 0;
 	}
 	
 	/**
@@ -382,7 +382,7 @@ public class Aky90Algorithm implements NetworkAlgorithm
 		Aky90Node parent = (Aky90Node)v.getParent();
 		return (
 			(v.getRootId().equals(v.getId()) && parent.getId().equals(v.getId()) && v.getDistance() == 0) ||
-			v.getRootId().compareToIgnoreCase(v.getId()) > 0 && v.isNeighborOf(parent) && 
+			compareIds(v.getRootId(),v.getId()) > 0 && v.isNeighborOf(parent) && 
 			v.getRootId().equals(parent.getRootId()) && v.getDistance() == parent.getDistance() + 1);
 	}
 	
@@ -442,6 +442,23 @@ public class Aky90Algorithm implements NetworkAlgorithm
 			v.getTo().equals(Aky90NodeAttributes.UNDEFINED_TO) &&
 			v.getFrom().equals(Aky90NodeAttributes.UNDEFINED_FROM) &&
 			v.getDirection().equals(Aky90NodeAttributes.UNDEFINED_DIRECTION));
+	}
+	
+	private int compareIds(String id1, String id2)
+	{
+		// Try to compare as integers (numeric)
+		try
+		{
+			int int1 = Integer.parseInt(id1);
+			int int2 = Integer.parseInt(id2);
+			return 	int1 > int2 ? 1 :
+					int1 < int2 ? -1 : 0;
+		}
+		// Otherwise compare strings (lexicographic)
+		catch (NumberFormatException e) 
+		{
+			return id1.compareToIgnoreCase(id2);
+		}
 	}
 
 }
