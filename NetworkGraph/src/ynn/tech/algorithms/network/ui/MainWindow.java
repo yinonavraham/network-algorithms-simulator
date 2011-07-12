@@ -248,9 +248,28 @@ public class MainWindow extends JFrame
 				_attributesView.setNodeAttributes(node);
 			}
 			@Override
-			public void nodesChanged(NodesEvent e) {}
+			public void nodesChanged(NodesEvent e) 
+			{
+				switch (e.getType())
+				{
+					case NodesEvent.ADDED:
+					case NodesEvent.REMOVED:
+						resetCommandStack();
+						break;
+				}
+			}
 			@Override
-			public void connectorsChanged(ConnectorsEvent e) {}
+			public void connectorsChanged(ConnectorsEvent e) 
+			{
+				switch (e.getType())
+				{
+					case ConnectorsEvent.ADDED:
+					case ConnectorsEvent.REMOVED:
+					case ConnectorsEvent.DIRECTION_CHANGED:
+						resetCommandStack();
+						break;
+				}
+			}
 		});
 	}
 
