@@ -54,6 +54,6 @@ public class ResetRequestVarsCommand implements Command
 	public String toString()
 	{
 		String suffix = _message == null ? "" : " - " + _message;
-		return String.format("%s: Reset Request varialbes%s", _node, suffix);
+		return String.format("%s: Reset Request variables%s", _node, suffix);
 	}
 }
