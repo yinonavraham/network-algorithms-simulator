@@ -59,12 +59,12 @@ import ynn.network.util.SerializationException;
 import ynn.tech.algorithms.network.AlgorithmDescriptor;
 import ynn.tech.algorithms.network.AlgorithmExecuter;
 import ynn.tech.algorithms.network.CommandStack;
-import ynn.tech.algorithms.network.aky90.Aky90Descriptor;
-import ynn.tech.algorithms.network.ewd426.EWD426Descriptor;
 import ynn.tech.algorithms.network.ui.attributes.AttributeChangedEvent;
 import ynn.tech.algorithms.network.ui.attributes.AttributesView;
 import ynn.tech.algorithms.network.ui.attributes.AttributesViewListener;
+import ynn.tech.algorithms.network.ui.help.HelpResourceLoader;
 import ynn.tech.algorithms.network.ui.icons.Icons;
+import ynn.tech.algorithms.network.ui.util.MiniBrowser;
 
 public class MainWindow extends JFrame
 {
@@ -88,6 +88,7 @@ public class MainWindow extends JFrame
 	private JMenuItem _playMenuPrev;
 	private JMenu _helpMenu;
 	private JMenuItem _helpMenuAbout;
+	private JMenuItem _helpMenuHelp;
 	
 	private JPanel _toolBarsPanel;
 	private JToolBar _toolBarFile;
@@ -123,10 +124,6 @@ public class MainWindow extends JFrame
     private int _nodeId = 1;
 	private File _currentFile = null;
 	private File _currentDir = null;
-    private AlgorithmDescriptor[] _algDescriptors = new AlgorithmDescriptor[] {
-    	new Aky90Descriptor(),
-    	new EWD426Descriptor()
-    };
     private AlgorithmDescriptor _algDescriptor = null;
 
 	public MainWindow()
@@ -712,6 +709,19 @@ public class MainWindow extends JFrame
 		_helpMenu = new JMenu("Help");
 		_helpMenu.setMnemonic(KeyEvent.VK_H);
 		_menuBar.add(_helpMenu);
+		// Help -> Help
+		_helpMenuHelp = new JMenuItem("Help", KeyEvent.VK_H);
+		_helpMenuHelp.setIcon(Icons.getHelp());
+		_helpMenuHelp.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				onHelp();
+			}
+		});
+		_helpMenu.add(_helpMenuHelp);
+		_helpMenu.add(new JSeparator());
 		// Help -> About
 		_helpMenuAbout = new JMenuItem("About", KeyEvent.VK_A);
 		_helpMenuAbout.setIcon(Icons.getAbout());
@@ -859,7 +869,8 @@ public class MainWindow extends JFrame
 
 	private void onNew()
 	{
-		NewNetworkDialog dialog = new NewNetworkDialog(this, _algDescriptors);
+		NewNetworkDialog dialog = new NewNetworkDialog(
+			this, Algorithms.getInstance().getSupportedAlgorithms());
 		AlgorithmDescriptor descriptor = dialog.showDialog();
 		if (descriptor != null)
 		{
@@ -1093,6 +1104,16 @@ public class MainWindow extends JFrame
 			updateSimulationTime();
 			_networkView.repaint();
 		}
+	}
+	
+	private void onHelp()
+	{
+		HelpResourceLoader loader = new HelpResourceLoader();
+		MiniBrowser help = new MiniBrowser(this, "Help", loader);
+		help.displayPage(loader.getResource("help.html"), true);
+		help.setSize(this.getSize());
+		help.setLocationRelativeTo(this);
+		help.setVisible(true);
 	}
 	
 	private void onAbout()

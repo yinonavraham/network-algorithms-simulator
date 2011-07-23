@@ -1,0 +1,44 @@
+body {
+	background-color:#ffffff;
+	}
+h1 {
+	color:#0000aa;
+	text-align:center;
+	}
+h2 {
+	color:#0000ff;
+	text-align:left;
+	}
+h3 {
+	color:#2222ff;
+	text-align:left;
+	}
+span.algorithm {
+	color:#4444ff;
+	font-weight:bold;
+	}
+
+table.info {
+	background-color:#ddddff;
+	padding:5px;
+	border:1px solid blue;
+	}
+table.info td.title {
+	font-weight:bold;
+	}
+table.info td.content {
+	}
+table.info span.icon {
+	background-color:#0000ff;
+	color:#ffffff;
+	font-weight:bold;
+	}
+
+span.code {
+	font-family:"Courier New", Monospace;
+	font-weight:bold;
+	}
+div.code_example {
+	font-family:"Courier New", Monospace;
+	background-color:#ffffcc;
+	}

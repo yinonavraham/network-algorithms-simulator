@@ -1,0 +1,114 @@
+<html>
+
+<head>
+<title>Help - AKY90</title>
+<link rel="stylesheet" type="text/css" href="help.css" />
+</head>
+
+<body>
+<a name="top"></a>
+<h1>AKY90 - Memory-Efficient Self Stabilizing Protocols for General Networks</h1>
+
+<h2>Content</h2>
+<a href="#authors">Authors</a><br>
+<a href="#abstract">Abstract</a><br>
+<a href="#simulate">How To Simulate</a><br>
+<hr>
+
+<a name="authors"></a><h2>Authors</h2>
+<p>
+Yehuda Afek<br>
+Shay Kutten<br>
+Moti Yung
+</p>
+<a href="#top">top</a><hr>
+
+<a name="abstract"></a><h2>Abstract</h2>
+<p>
+A self stabilizing protocol for constructing a rooted spanning tree in an arbitrary asynchronous
+network of processors that communicate through shared memory is presented. The processors 
+have unique identifiers but are otherwise identical. The network topology is assumed
+to be dynamic, that is, edges can join or leave the computation before it eventually stabilizes.
+</p><p>
+The algorithm is design uses a new paradigm in self stabilization. The idea is to ensure
+that if the system is not in a legal state (this is a global condition) then a local condition of
+some node will be violated. Thus the new could restart the algorithm.
+</p><p>
+The algorithm provides an underlying self-stabilization mechanism and can serve as a basic
+building block in the construction of self stabilizing protocols for several other applications such
+as: mutual-exclusion, snapshot, and reset.
+</p><p>
+The algorithm is memory efficient in that it requires only a linear size memory of words of
+size log n (the size of an identity) over the entire network. Each processor needs a constant
+number of words per incident link, thus the storage requirement is in the same order of magnitude
+as the size of the traditionally assumed message buffers size. The adversary may be
+permitted to initiate the values of the variables to any size. Still, in this case the additional
+memory used by the algorithm is the amount stated above.
+</p><p>
+Extensions of our algorithm to other models are also discussed.
+</p>
+<h3>Additional Information</h3>
+Following are several conditions defined in the algorithm.
+<h4>Condition C1:</h4>
+The node is in a legal state. Violations of the condition -
+either because of incorrect initial values of the nodes' variables,
+or because of topological changes.
+<h4>Condition C1':</h4> 
+By becoming a root condition C1 does not necessarily become true, 
+however we define condition C1' which does become true. Moreover, 
+if condition C1 is satisfied at all the nodes then (by transitivity) 
+the Parent variables in the nodes define a spanning forest in the network. 
+<h4>Condition C2': </h4>
+C2' is true if node v is forwarding a request from any node w 
+(w is a neighbor of v). 
+<h4>Condition C2: </h4>
+C2 is true if the variables related to the process of forwarding requests
+are in a legal state.
+<br>
+<a href="#top">top</a><hr>
+
+<a name="simulate"></a><h2>How To Simulate</h2>
+<p>
+In order to build a network for simulating this algorithm, follow these steps:<br>
+<ol>
+	<li>Create a new network, associated to this algorithm</li>
+	<li>Add as much nodes as you need to the panel</li>
+	<li>Connects the node as you like - create a network</li>
+</ol>
+Now the network is ready for the simulation to be executed.
+</p>
+<p>
+<i>An example for a network</i><br>
+<img alt="Network Example" src="img/alg_aky90_1.jpg">
+</p>
+<p>
+<i>An example for a network after a few steps were executed. 
+You can note that there are nodes that already joined a tree (annotated by a directed arrow, 
+pointing the parent node). Also, there are nodes that are participating in forwarding requests
+</i>
+</p>
+<ul>
+	<li><i><b>Ask</b> - As seen in the image, node 2 forwards a request to node 5 from node 4 for the requesting node (4)</i></li>
+	<li><i><b>Grant</b> - As seen in the image, node 5 grants node 3 for the requesting node (3)</i></li>
+</ul>
+<img alt="Network Example" src="img/alg_aky90_2.jpg">
+<p>
+<i>The resulting spanning tree (also rearranged as a tree)</i><br>
+<img alt="Network Example" src="img/alg_aky90_3.jpg">
+&nbsp;<i>Rearranged as a tree</i>&nbsp;==&gt;&nbsp;
+<img alt="Network Example" src="img/alg_aky90_4.jpg">
+</p>
+<h3>Supported Adversary's Attacks</h3>
+<ul>
+	<li>Remove node</li>
+	<li>Add node</li>
+	<li>Connect nodes</li>
+	<li>Disconnect nodes</li>
+	<li>Change the values of the request variables (From, Request, To, Direction)</li>
+	<li>Change the distance value</li>
+	<li>Change the parent of a node</li>
+	<li>Change the root of a node</li>
+</ul>
+<a href="#top">top</a><hr>
+</body>
+</html>

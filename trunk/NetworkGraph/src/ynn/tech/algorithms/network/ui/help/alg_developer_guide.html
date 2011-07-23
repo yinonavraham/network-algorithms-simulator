@@ -1,0 +1,174 @@
+<html>
+
+<head>
+<title>Help - AKY90</title>
+<link rel="stylesheet" type="text/css" href="help.css" />
+</head>
+
+<body>
+<a name="top"></a>
+<h1>How To Implement a New Algorithm</h1>
+<h2>Content</h2>
+<a href="#overview">Overview</a><br>
+<a href="#algorithm">NetworkAlgorithm</a><br>
+<a href="#algorithm_descriptor">AlgorithmDescriptor</a><br>
+<a href="#node_attributes">NodeAttributes</a><br>
+<a href="#algorithm_utils">AlgorithmUtils</a><br>
+<a href="#step_context">StepContext</a><br>
+<a href="#command">Command</a><br>
+<a href="#node">Node</a><br>
+<a href="#annotation_provider">IAnnotationProvider</a><br>
+<hr>
+
+<a name="overview"></a><h2>Overview</h2>
+<p>
+Network Algorithms Simulator (NAS) is an application which is a platform
+for simulating various network related algorithms. The application comes
+with a set of supported algorithms. This set can be enriched with more
+algorithms. In order to add an algorithms to the supported set, read the
+following implementation guide.   
+</p>
+<p>
+Each algorithm must implement the following interfaces:
+</p>
+<ul>
+	<li>
+		<span class='code'>NetworkAlgorithm</span> - 
+		The algorithm's code
+	</li>
+	<li>
+		<span class='code'>AlgorithmDescriptor</span> - 
+		A descriptor for the algorithm
+	</li>
+	<li>
+		<span class='code'>NodeAttributes</span> - 
+		Container for the attributes (variables) defined for the nodes in the algorithm
+	</li>
+	<li>
+		<span class='code'>AlgorithmUtils</span> - 
+		Utilities class for the algorithm
+	</li>
+</ul>
+<p>
+After implementing the interfaces above, make sure to register the new algorithm
+in the <span class='code'>Algorithms</span> class - add it to the list of supported
+algorithms.<br>
+It is highly recommended to extend the <span class='code'>Node</span> class and 
+create a node implementation which is algorithm specific. 
+</p>
+<a href="#top">top</a><hr>
+
+<a name="algorithm"></a><h2>ynn.tech.algorithms.network.NetworkAlgorithm</h2>
+<p>
+This is the main interface that needs to be implemented. Class that implements
+this interface is the class that executes the step of the algorithm. In order
+to to so, implement the '<span class='code'>void performStep(StepContext context)</span>' 
+method. This method gets the step context as an input and performs the step.
+The context contains the entire network that the algorithm is executed  on.
+The actions that needs to be executed according to the current step should be
+added to the context. (see <a href='#step_context'><span class='code'>StepContext</span></a>)
+</p>
+<a href="#top">top</a><hr>
+
+<a name="algorithm_descriptor"></a><h2>ynn.tech.algorithms.network.AlgorithmDescriptor</h2>
+<p>
+This class has two main purposes: 
+</p>
+<ol>
+	<li>Give information regarding the algorithm - code, name, description, etc.</li>
+	<li>It is the entry point for an algorithm - each functionality for handling
+		an algorithm can be accessed using this class by requesting the algorithm's
+		utilities class</li>
+</ol>
+<a href="#top">top</a><hr>
+
+<a name="node_attributes"></a><h2>ynn.tech.algorithms.network.NodeAttributes</h2>
+<p>
+This interface should be implemented in order to supply the specific attributes (variables)
+this algorithm requires / supports.  
+</p>
+<a href="#top">top</a><hr>
+
+<a name="algorithm_utils"></a><h2>ynn.tech.algorithms.network.AlgorithmUtils</h2>
+<p>
+This interface hold several utility methods with specific implementation for the
+algorithm. The methods are:  
+</p>
+<ol>
+	<li>
+		<span class='code'>NetworkAlgorithm createAlgorithm()</span> - 
+		Method for creating the specific algorithm class
+	</li>
+	<li>
+		<span class='code'>Node createNode()</span> - 
+		Method for creating a node which is specific for the algorithm
+	</li>
+	<li>
+		<span class='code'>void initNodeAttributes(Node node)</span> - 
+		Method for initializing a given node according to the specific requirements 
+		of the algorithm
+	</li>
+</ol>
+<a href="#top">top</a><hr>
+
+<a name="step_context"></a><h2>ynn.tech.algorithms.network.StepContext</h2>
+<p>
+A step context contains the information on the current step that the algorithm
+executes. The context contains the following methods:
+</p>
+<ul>
+	<li>
+		<span class='code'>NetworkModel getNetwork()</span> - 
+		This method returns the current network for the algorithm to execute on
+	</li>
+	<li>
+		<span class='code'>CompositeCommand getCommands()</span> -
+		Use this method in order to add a new command to be executed as the result 
+		of a step. For example:
+		<div class='code_example'>
+		Command cmd = new SetNodeAttributeCommand(...);<br>
+		context.getContext().add(cmd);
+		</div>  
+		(see <a href='#command'><span class='code'>Command</span></a>)
+	</li>
+</ul>
+<a href="#top">top</a><hr>
+
+<a name="command"></a><h2>ynn.tech.algorithms.network.Command</h2>
+<p>
+This is an interface for a command. There are several predefined basic commands: 
+</p>
+<ul>
+	<li>
+		<span class='code'>CompositeCommand</span> - 
+		Command for composing several commands as a single command 
+	</li>
+	<li>
+		<span class='code'>SetNodeAttributeCommand</span> - 
+		Command for setting an attribute (variable's value) of a certain node 
+	</li>
+</ul>
+<p>
+Each algorithm can reuse the commands above or define its own commands by 
+implementing this interface.
+</p> 
+<a href="#top">top</a><hr>
+
+<a name="node"></a><h2>ynn.network.model.Node</h2>
+<p>
+This is the element from which a network is composed. This is the basic class 
+that represents a node (vertex) in a network. A new algorithm can (should) 
+extend this class in order to have an implementation specific for the algorithm. 
+</p>
+<a href="#top">top</a><hr>
+
+<a name="annotation_provider"></a><h2>ynn.network.ui.IAnnotationProvider</h2>
+<p>
+A node can implement this interface in order to display an annotation over the
+node's shape.
+</p>
+<a href="#top">top</a><hr>
+
+</body>
+
+</html>
