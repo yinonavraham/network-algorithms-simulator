@@ -1,0 +1,162 @@
+<html>
+
+<head>
+<title>Help - User Interface</title>
+<link rel="stylesheet" type="text/css" href="help.css" />
+</head>
+
+<body>
+<a name="top"></a>
+<h1>User Interface</h1>
+<h2>Content</h2>
+<a href="#overview">Overview</a><br>
+<a href="#toolbars">Tool Bars</a><br>
+<a href="#newmodel">New Network Model Wizard</a><br>
+<a href="#alg_exec">Algorithm Execution</a><br>
+<a href="#views">Views (Tabs)</a><br>
+<hr>
+
+<a name="overview"></a><h2>Overview</h2>
+<img alt="" src="img/nas_in_action.jpg"><br>
+<p>
+NAS (Network Algorithms Simulator) enables you to simulate various algorithms.
+You can create new networks, open existing networks, execute the algorithms,
+simulate an adversary by modifying the network and the nodes it composed from, etc.
+</p>
+<p>
+As seen in the image above, the user interface is composed of the following sections:
+</p>
+<ol>
+	<li><b>Menu Bar</b> - Contains the various menus, enables most of the supported actions</li>
+	<li><b>Tool Bar</b> - Contains the various tool bars, enables most of the supported actions</li>
+	<li><b>Network Panel</b> - The workspace for composing the networks</li>
+	<li><b>Views</b> - Various additional views, arranged in tabs</li>
+</ol>
+All the sections above are described in details in the next topics.
+<a href="#top">top</a><hr>
+
+<a name="toolbars"></a><h2>Tool Bars</h2>
+The tool bar contains several separated tool bars, described below. 
+
+<h3>File</h3>
+<img alt="" src="img/toolbar_file.jpg">
+<p>
+The File tool bar enables the following file actions:
+</p>
+<ol>
+	<li>Create a new file (a new network)</li>
+	<li>Open an existing file</li>
+	<li>Save the current network</li>
+</ol>
+<h3>Edit</h3>
+<img alt="" src="img/toolbar_edit.jpg">
+<p>
+The Edit tool bar enables the following actions:
+</p>
+<ol>
+	<li>Switch between view mode and edit mode</li>
+	<li>Add a new node to the network panel</li>
+	<li>Delete the selected element (node or connector)</li>
+	<li>Switch between editing modes<br>
+		<table><tr>
+			<td><img alt="" src="img/toolbar_edit_mode.jpg"></td>
+			<td><ol>
+				<li>Move nodes - Drag &amp; drop a node in order to change its location</li>
+				<li>Connect nodes - In order to connect two nodes - click on a node, 
+					drag while still pressed, release over the node to connect to</li>
+			</ol></td>
+		</tr></table>
+	</li>
+</ol>
+
+<h3>Simulation</h3>
+<img alt="" src="img/toolbar_simulation.jpg">
+<p>
+The Simulation tool bar enables the following actions: 
+</p>
+<ol>
+	<li>Undo the last action (only actions done by the executed algorithm)</li>
+	<li>Perform the next step of the algorithm</li>
+	<li>This is an indicator for the current "time" in the algorithm's execution</li>
+</ol>
+<a href="#top">top</a><hr>
+
+<a name="newmodel"></a><h2>New Network Model Wizard</h2>
+<img alt="" src="img/new_network_wizard.jpg">
+<p>
+When you decide to create a new network model, you will get to the dialog seen above.
+Every network model is associated with an algorithm. This is because each algorithm
+requires different node variables. This dialog lets you select the algorithm for which 
+you would like to create the network.
+</p>
+<p>
+As you can see, the dialog displays a list of all available algorithms. Select an 
+algorithm in order to see a more detailed description of it. In order to create 
+the network, approve the selection. 
+</p>
+<a href="#top">top</a><hr>
+
+<a name="alg_exec"></a><h2>Algorithm Execution</h2>
+<p>
+After a network was composed, you can simulate the algorithm's execution on it. 
+In order to do so, switch to "View Mode" and use the simulation actions. During the
+execution, each node can be annotated according to the implementation of the 
+specific algorithm. Additional information can be viewed in the Console view. You can
+look at the simulation tool bar for indication on the current "time" of execution. 
+</p>
+<p>
+In order to simulate an adversary, switch back to "Edit Mode", select the "Variables"
+view, and modify the variables (according to the definition of the specific algorithm).<br>
+For more information, see the information on the specific <a href="help.html#algorithms">algorithms</a>. 
+</p>
+<br>
+<table class='info'>
+	<tr>
+		<td class='title'>
+		<span class='icon'>&nbsp;&nbsp;i&nbsp;&nbsp;</span>
+		Note
+		</td>
+	</tr>
+	<tr>
+		<td class='content'>
+		After any manual modification of the network (add/remove/connect/disconnect nodes),
+		or change to the values of a node's variables, the steps cannot be undo.
+		</td>
+	</tr>
+</table>
+<a href="#top">top</a><hr>
+
+<a name="views"></a><h2>Views (Tabs)</h2>
+Following are several views for additional information or actions. 
+
+<h3>Console</h3>
+<img alt="" src="img/console_view.jpg">
+<p>
+The console displays messages from the application. Most of the messages are
+related to the simulation process. During the execution of an algorithm, you
+can watch the console in order to see what exactly is done in each step.
+</p>
+
+<h3>Variables</h3>
+<img alt="" src="img/variables_view.jpg">
+<p>
+The variables view displays the various variables of the selected element in 
+the network. The displayed variables are pairs of variables name and its value.   
+The view has two modes: View &amp; Edit. In order to switch between
+the two modes, use the button in the Edit tool bar. When in edit mode, the 
+values of the variables can be modified (whether for setup proposes, or simulating
+an adversary).
+</p>
+
+<h3>Algorithm</h3>
+<img alt="" src="img/algorithm_view.jpg">
+<p>
+The Algorithm view displays the information on the algorithm that the current 
+network model is associated to. This information is similar to the information
+given in the "New Network Model Wizard". It should contain the algorithm's 
+name, basic description of it, and sometimes further hints on it.  
+</p>
+<a href="#top">top</a><hr>
+
+</body>
+</html>

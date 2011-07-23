@@ -1,0 +1,80 @@
+<html>
+
+<head>
+<title>Help - EWD426</title>
+<link rel="stylesheet" type="text/css" href="help.css" />
+</head>
+
+<body>
+<a name="top"></a>
+<h1>EWD426 - Self-stabilizing Systems in Spite of Distributed Control</h1>
+
+<h2>Content</h2>
+<a href="#authors">Authors</a><br>
+<a href="#abstract">Abstract</a><br>
+<a href="#simulate">How To Simulate</a><br>
+<hr>
+
+<a name="authors"></a><h2>Authors</h2>
+<p>
+Prof. Dr. Edsger W. Dijkstra
+</p>
+<a href="#top">top</a><hr>
+
+<a name="abstract"></a><h2>Abstract</h2>
+<p>
+In a sparsely connected system with distributed control the local rules of behaviour can 
+guarantee within a bounded number of steps convergence of the system as a whole towards 
+satisfying a global requirement.</p>
+<p>
+<b>Keywords:</b> multiprocessing, networks, self-stabilization, synchronization,
+mutual exclusion, robustness, sharing, error recovery, distributed control,
+harmonious co-operation, self-repair. 
+</p>
+<a href="#top">top</a><hr>
+
+<a name="simulate"></a><h2>How To Simulate</h2>
+<p>
+Dijkstra's paper, which introduces the concept of self-stabilization,
+presents an example in the context of a "token ring" — a network of 
+computers ordered in a circle, such that exactly one of them is supposed 
+to "hold a token" at any given time. <br>
+Not holding a token is a correct state for each computer in this network, 
+since the token can be held by another computer. However, if every computer 
+is in the state of "not holding a token" then the network altogether is 
+not in a correct state. <br>
+Similarly, if more than one computer "holds a token" then this is not a 
+correct state for the network, although it cannot be observed to be incorrect 
+by viewing any computer individually. Since every computer can "observe"
+only the states of its two neighbors, it is hard for the computers to decide
+whether the network altogether is in a correct state.
+</p>
+<p>
+In order to build a network for simulating this algorithm, follow these steps:<br>
+<ol>
+	<li>Create a new network, associated to this algorithm</li>
+	<li>Add as much nodes as you need to the panel, order these nodes in a ring (circle)</li>
+	<li>Connect the nodes in the circle, each node to its two neighbors</li>
+	<li>For each node define its parent node - this is the node it looks at</li>
+	<li>Select a single node and set it as root</li>
+</ol>
+Now the network is ready for the simulation to be executed.
+</p>
+<p>
+<i>An example for a ring - each node has its parent node defined (annotated by the arrows), 
+the selected node (1) is set as the root node.</i><br>
+<img alt="Token Ring Example" src="img/alg_ewd426_1.jpg">
+</p>
+<p>
+<i>The ring above after several steps had been executed. The token value in each node
+is displayed in the annotation, the node which currently holds the token has also a "T" 
+in its annotation.</i><br>
+<img alt="Token Ring Example" src="img/alg_ewd426_2.jpg">
+</p>
+<h3>Supported Adversary's Attacks</h3>
+<ul>
+	<li>Change the token value in a node</li>
+</ul>
+<a href="#top">top</a><hr>
+</body>
+</html>

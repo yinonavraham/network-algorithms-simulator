@@ -105,6 +105,11 @@ public class Icons
 		return getIcon("About.png");
 	}
 	
+	public static Icon getHelp()
+	{
+		return getIcon("Help.png");
+	}
+	
 	public static Icon getClipboard()
 	{
 		return getIcon("Clipboard.png");

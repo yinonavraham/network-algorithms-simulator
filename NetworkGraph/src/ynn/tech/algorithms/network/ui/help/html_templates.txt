@@ -1,0 +1,17 @@
+########################################
+### Template for an information note ###
+########################################
+
+<table class='info'>
+	<tr>
+		<td class='title'>
+		<span class='icon'>&nbsp;&nbsp;i&nbsp;&nbsp;</span>
+		Note
+		</td>
+	</tr>
+	<tr>
+		<td class='content'>
+		{Add text here}
+		</td>
+	</tr>
+</table>
